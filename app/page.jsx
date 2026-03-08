@@ -1953,50 +1953,414 @@ export default function MhaStoryApp() {
     }
   };
 
+  // ─── Mechanic assignment per topic ───────────────────────────────────────
+  // 'buttons'      → Tests 1,2,6,7  (4-choice card, styled per topic)
+  // 'swipe'        → Tests 3,9      (swipe left=No / right=Yes)
+  // 'reveal'       → Tests 4,10     (tap to reveal frame-by-frame)
+  // 'multiselect'  → Tests 5,11     (tap multiple, confirm)
+  // 'dragsort'     → Tests 8,12     (drag to rank/sort)
+  const MECHANIC = { 1:'buttons',2:'buttons',3:'swipe',4:'reveal',5:'multiselect',6:'buttons',7:'buttons',8:'dragsort',9:'swipe',10:'reveal',11:'multiselect',12:'dragsort' };
+
   const QuizScreen = () => {
     const q = quizQuestions[currentQuestion];
-    const optionColors = [
-      'linear-gradient(135deg, #4ECDC4, #44A89A)',
-      'linear-gradient(135deg, #6C63FF, #5A52D5)',
-      'linear-gradient(135deg, #FF6B6B, #E55555)',
-      'linear-gradient(135deg, #FFD93D, #E5C235)',
-    ];
-    return (
-      <div style={styles.container}>
-        <div style={{...styles.glowOrb, width: 200, height: 200, background: currentTopic.color, top: 100, left: -80}} />
-        <div style={styles.content}>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-            <button onClick={() => setScreen('topic-intro')} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: 'white' }}>←</button>
-            <div style={{ flex: 1, textAlign: 'center' }}>
-              <span style={{ fontSize: 20 }}>{currentTopic.emoji}</span>
-              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', marginLeft: 8 }}>{currentTopic.name}</span>
-            </div>
-            <span style={{ background: currentTopic.color, color: 'white', padding: '6px 14px', borderRadius: 20, fontSize: 14, fontWeight: 700 }}>
-              {currentQuestion + 1}/10
-            </span>
+    const mechanic = MECHANIC[currentTopic.id] || 'buttons';
+    const color = currentTopic.color;
+    const dogName = leadInfo.dogName || 'น้องหมา';
+
+    // ── Shared Header ─────────────────────────────────────────────────────
+    const Header = () => (
+      <>
+        <div style={{ display:'flex', alignItems:'center', marginBottom:16 }}>
+          <button onClick={() => setScreen('topic-intro')} style={{ background:'none', border:'none', fontSize:24, cursor:'pointer', color:'white' }}>←</button>
+          <div style={{ flex:1, textAlign:'center' }}>
+            <span style={{ fontSize:20 }}>{currentTopic.emoji}</span>
+            <span style={{ fontSize:13, color:'rgba(255,255,255,0.6)', marginLeft:8 }}>{currentTopic.name}</span>
           </div>
-          <div style={{ height: 6, background: 'rgba(255,255,255,0.1)', borderRadius: 3, marginBottom: 24, overflow: 'hidden' }}>
-            <div style={{ width: `${((currentQuestion + 1) / 10) * 100}%`, height: '100%', background: `linear-gradient(90deg, ${currentTopic.color}, #FFD93D)`, borderRadius: 3, transition: 'width 0.5s ease', boxShadow: `0 0 20px ${currentTopic.color}` }} />
-          </div>
-          <div style={{ ...styles.card, textAlign: 'center' }}>
-            <h2 style={{ fontSize: 20, fontWeight: 700, color: '#333', lineHeight: 1.5, marginBottom: 24, minHeight: 60 }}>{q.q}</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {q.options.map((opt, i) => (
-                <button key={opt.id} onClick={() => handleAnswer(opt.score)} style={{
-                  padding: '14px 18px', borderRadius: 14, border: 'none', cursor: 'pointer',
-                  background: optionColors[i], color: 'white', fontSize: 15, fontWeight: 600,
-                  textAlign: 'left', lineHeight: 1.4, boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
-                  transition: 'transform 0.15s ease', fontFamily: 'inherit'
-                }}
-                onMouseOver={e => e.currentTarget.style.transform='scale(1.02)'}
-                onMouseOut={e => e.currentTarget.style.transform='scale(1)'}
-                >{opt.text}</button>
-              ))}
+          <span style={{ background:color, color:'white', padding:'6px 14px', borderRadius:20, fontSize:14, fontWeight:700 }}>{currentQuestion+1}/10</span>
+        </div>
+        <div style={{ height:6, background:'rgba(255,255,255,0.1)', borderRadius:3, marginBottom:20, overflow:'hidden' }}>
+          <div style={{ width:`${((currentQuestion+1)/10)*100}%`, height:'100%', background:`linear-gradient(90deg,${color},#FFD93D)`, borderRadius:3, transition:'width 0.5s ease' }} />
+        </div>
+      </>
+    );
+
+    // ════════════════════════════════════════════════════════════════
+    // MECHANIC A: BUTTONS — Tests 1,2,6,7
+    // 4 choices, styled differently per topic
+    // ════════════════════════════════════════════════════════════════
+    if (mechanic === 'buttons') {
+      const cardStyles = {
+        1:  { bg:'rgba(255,255,255,0.96)', textColor:'#1a1a2e', btnColors:['#FF6B6B','#FF8E53','#4ECDC4','#45B7D1'] },
+        2:  { bg:'rgba(255,255,255,0.96)', textColor:'#1a1a2e', btnColors:['#FF6B9D','#C850C0','#4158D0','#48C9B0'] },
+        6:  { bg:'rgba(20,20,40,0.95)',    textColor:'white',   btnColors:['#4ECDC4','#45B7D1','#96CEB4','#FFEAA7'] },
+        7:  { bg:'rgba(20,20,40,0.95)',    textColor:'white',   btnColors:['#A29BFE','#6C5CE7','#FD79A8','#FDCB6E'] },
+      };
+      const cs = cardStyles[currentTopic.id] || cardStyles[1];
+      return (
+        <div style={styles.container}>
+          <div style={{...styles.glowOrb, width:250, height:250, background:color, top:-60, right:-80}} />
+          <div style={styles.content}>
+            <Header />
+            <div style={{ background:cs.bg, borderRadius:24, padding:24, boxShadow:'0 20px 60px rgba(0,0,0,0.3)' }}>
+              <h2 style={{ fontSize:19, fontWeight:700, color:cs.textColor, lineHeight:1.6, marginBottom:24 }}>{q.q}</h2>
+              <div style={{ display:'flex', flexDirection:'column', gap:11 }}>
+                {q.options.map((opt,i) => (
+                  <button key={opt.id} onClick={() => handleAnswer(opt.score)} style={{
+                    padding:'14px 18px', borderRadius:14, border:'none', cursor:'pointer',
+                    background:cs.btnColors[i], color:'white', fontSize:15, fontWeight:600,
+                    textAlign:'left', lineHeight:1.4, boxShadow:'0 4px 14px rgba(0,0,0,0.18)',
+                    transition:'all 0.18s', fontFamily:'inherit'
+                  }}
+                  onMouseOver={e=>{e.currentTarget.style.transform='translateX(4px) scale(1.01)';e.currentTarget.style.boxShadow='0 6px 20px rgba(0,0,0,0.28)';}}
+                  onMouseOut={e=>{e.currentTarget.style.transform='none';e.currentTarget.style.boxShadow='0 4px 14px rgba(0,0,0,0.18)';}}
+                  >{opt.text}</button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    );
+      );
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // MECHANIC B: SWIPE — Tests 3,9
+    // Card swipe left (No/ไม่เลย) or right (Yes/บ่อยมาก)
+    // Touch + mouse drag supported
+    // ════════════════════════════════════════════════════════════════
+    if (mechanic === 'swipe') {
+      const SwipeCard = () => {
+        const [drag, setDrag] = useState({ x:0, dragging:false, startX:0 });
+        const [decided, setDecided] = useState(null);
+        const cardRef = useRef(null);
+
+        const threshold = 80;
+        const rotate = drag.x / 12;
+        const opacity = Math.max(0, 1 - Math.abs(drag.x) / 300);
+
+        const decide = (dir) => {
+          // dir: 'yes'=right=score 4/3, 'no'=left=score 1/2
+          // Use first 2 options for No, last 2 for Yes based on drag intensity
+          const isStrong = Math.abs(drag.x) > threshold * 1.5;
+          let score;
+          if (dir === 'yes') score = isStrong ? q.options[0].score : q.options[1].score;
+          else               score = isStrong ? q.options[3].score : q.options[2].score;
+          setDecided(dir);
+          setTimeout(() => handleAnswer(score), 350);
+        };
+
+        const onStart = (x) => setDrag({ x:0, dragging:true, startX:x });
+        const onMove  = (x) => { if(drag.dragging) setDrag(d => ({...d, x: x - d.startX})); };
+        const onEnd   = () => {
+          if (!drag.dragging) return;
+          if (drag.x >  threshold) decide('yes');
+          else if (drag.x < -threshold) decide('no');
+          else setDrag({ x:0, dragging:false, startX:0 });
+        };
+
+        const leftColor  = decided==='no'  ? '#FF6B6B' : drag.x < -30 ? '#FF6B6B' : 'rgba(255,107,107,0.3)';
+        const rightColor = decided==='yes' ? '#2ECC71' : drag.x >  30 ? '#2ECC71' : 'rgba(46,204,113,0.3)';
+
+        return (
+          <div style={{ position:'relative', userSelect:'none' }}>
+            {/* Labels */}
+            <div style={{ display:'flex', justifyContent:'space-between', marginBottom:16, padding:'0 8px' }}>
+              <div style={{ display:'flex', alignItems:'center', gap:6, opacity: drag.x < -20 ? 1 : 0.4, transition:'opacity 0.2s' }}>
+                <div style={{ width:40, height:40, borderRadius:'50%', background:leftColor, display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, transition:'background 0.2s' }}>❌</div>
+                <span style={{ color:'#FF6B6B', fontWeight:700, fontSize:14 }}>ไม่เลย</span>
+              </div>
+              <div style={{ display:'flex', alignItems:'center', gap:6, flexDirection:'row-reverse', opacity: drag.x > 20 ? 1 : 0.4, transition:'opacity 0.2s' }}>
+                <div style={{ width:40, height:40, borderRadius:'50%', background:rightColor, display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, transition:'background 0.2s' }}>✅</div>
+                <span style={{ color:'#2ECC71', fontWeight:700, fontSize:14 }}>เคยบ่อย!</span>
+              </div>
+            </div>
+
+            {/* Swipe Card */}
+            <div
+              ref={cardRef}
+              onMouseDown={e => onStart(e.clientX)}
+              onMouseMove={e => onMove(e.clientX)}
+              onMouseUp={onEnd}
+              onMouseLeave={onEnd}
+              onTouchStart={e => onStart(e.touches[0].clientX)}
+              onTouchMove={e => { e.preventDefault(); onMove(e.touches[0].clientX); }}
+              onTouchEnd={onEnd}
+              style={{
+                background:'rgba(255,255,255,0.97)',
+                borderRadius:24, padding:28,
+                boxShadow:`0 20px 60px rgba(0,0,0,0.35), 0 0 0 3px ${drag.x > 40 ? '#2ECC71' : drag.x < -40 ? '#FF6B6B' : 'transparent'}`,
+                transform:`translateX(${decided ? (decided==='yes'?300:-300) : drag.x}px) rotate(${decided ? (decided==='yes'?20:-20) : rotate}deg)`,
+                transition: drag.dragging ? 'box-shadow 0.1s' : 'all 0.35s cubic-bezier(0.25,0.46,0.45,0.94)',
+                cursor: drag.dragging ? 'grabbing' : 'grab',
+                touchAction:'none',
+                opacity: decided ? 0 : 1
+              }}
+            >
+              <div style={{ fontSize:13, color:color, fontWeight:700, letterSpacing:2, marginBottom:12 }}>
+                {currentTopic.emoji} สถานการณ์นี้เกิดกับ{dogName}ไหม?
+              </div>
+              <h2 style={{ fontSize:20, fontWeight:700, color:'#1a1a2e', lineHeight:1.6, marginBottom:20 }}>{q.q}</h2>
+              <div style={{ display:'flex', justifyContent:'center', gap:8, opacity:0.5 }}>
+                <span style={{ fontSize:12, color:'#999' }}>← ปัดซ้าย ไม่เคย</span>
+                <span style={{ fontSize:12, color:'#999' }}>|</span>
+                <span style={{ fontSize:12, color:'#999' }}>เคยบ่อย ปัดขวา →</span>
+              </div>
+            </div>
+
+            {/* Tap buttons fallback */}
+            <div style={{ display:'flex', gap:12, marginTop:16 }}>
+              <button onClick={() => decide('no')} style={{ flex:1, padding:'14px', borderRadius:16, border:`2px solid #FF6B6B`, background:'rgba(255,107,107,0.1)', color:'#FF6B6B', fontSize:15, fontWeight:700, cursor:'pointer', fontFamily:'inherit' }}>
+                ❌ ไม่เคย
+              </button>
+              <button onClick={() => decide('yes')} style={{ flex:1, padding:'14px', borderRadius:16, border:`2px solid #2ECC71`, background:'rgba(46,204,113,0.1)', color:'#2ECC71', fontSize:15, fontWeight:700, cursor:'pointer', fontFamily:'inherit' }}>
+                ✅ เคยบ่อย!
+              </button>
+            </div>
+          </div>
+        );
+      };
+      return (
+        <div style={styles.container}>
+          <div style={{...styles.glowOrb, width:250, height:250, background:color, top:80, left:-80}} />
+          <div style={styles.content}>
+            <Header />
+            <SwipeCard />
+          </div>
+        </div>
+      );
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // MECHANIC C: REVEAL — Tests 4,10
+    // Tap to uncover clues one by one, then pick answer
+    // ════════════════════════════════════════════════════════════════
+    if (mechanic === 'reveal') {
+      const RevealCard = () => {
+        const clues = q.options.map((o,i) => ({ text: o.text, score: o.score, emoji: ['🔍','💡','🎯','⭐'][i] }));
+        const [revealed, setRevealed] = useState([]);
+        const [chosen, setChosen] = useState(null);
+
+        const revealNext = () => {
+          if (revealed.length < clues.length) setRevealed(r => [...r, revealed.length]);
+        };
+
+        const pick = (score) => {
+          setChosen(score);
+          setTimeout(() => handleAnswer(score), 400);
+        };
+
+        return (
+          <div>
+            <div style={{ background:'rgba(255,255,255,0.06)', borderRadius:20, padding:20, marginBottom:16, border:`1px solid ${color}44` }}>
+              <div style={{ fontSize:12, color:color, fontWeight:700, letterSpacing:2, marginBottom:10 }}>
+                🎬 REVEAL THE MOMENT
+              </div>
+              <h2 style={{ fontSize:18, fontWeight:700, color:'white', lineHeight:1.6 }}>{q.q}</h2>
+            </div>
+
+            <div style={{ display:'flex', flexDirection:'column', gap:10, marginBottom:16 }}>
+              {clues.map((clue, i) => {
+                const isRevealed = revealed.includes(i);
+                const isChosen = chosen === clue.score;
+                return (
+                  <div key={i}
+                    onClick={() => isRevealed ? pick(clue.score) : revealNext()}
+                    style={{
+                      padding:'16px 18px', borderRadius:16, cursor:'pointer',
+                      background: isChosen ? `${color}33` : isRevealed ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.04)',
+                      border: isChosen ? `2px solid ${color}` : isRevealed ? '1.5px solid rgba(255,255,255,0.2)' : '1.5px dashed rgba(255,255,255,0.15)',
+                      transition:'all 0.3s', display:'flex', alignItems:'center', gap:14
+                    }}
+                  >
+                    <span style={{ fontSize:24, flexShrink:0 }}>{isRevealed ? clue.emoji : '❓'}</span>
+                    <div style={{ flex:1 }}>
+                      {isRevealed
+                        ? <span style={{ fontSize:14, color:'white', lineHeight:1.5 }}>{clue.text}</span>
+                        : <span style={{ fontSize:13, color:'rgba(255,255,255,0.3)' }}>แตะเพื่อเปิดเผย...</span>
+                      }
+                    </div>
+                    {isRevealed && !chosen && (
+                      <span style={{ fontSize:11, color:color, fontWeight:700, flexShrink:0 }}>เลือก →</span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {revealed.length === 0 && (
+              <button onClick={revealNext} style={{ ...styles.btn, background:`linear-gradient(135deg,${color},${color}99)`, color:'white' }}>
+                👆 แตะเพื่อเริ่มเปิดเผย
+              </button>
+            )}
+            {revealed.length > 0 && revealed.length < clues.length && !chosen && (
+              <div style={{ textAlign:'center', fontSize:13, color:'rgba(255,255,255,0.5)' }}>
+                เปิดเผยแล้ว {revealed.length}/{clues.length} — แตะเปิดต่อ หรือเลือกที่ตรงที่สุด
+              </div>
+            )}
+          </div>
+        );
+      };
+      return (
+        <div style={styles.container}>
+          <div style={{...styles.glowOrb, width:220, height:220, background:color, bottom:-60, right:-60}} />
+          <div style={styles.content}>
+            <Header />
+            <RevealCard />
+          </div>
+        </div>
+      );
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // MECHANIC D: MULTI-SELECT — Tests 5,11
+    // Tap multiple options that apply, then confirm
+    // Score = sum of selected / max possible
+    // ════════════════════════════════════════════════════════════════
+    if (mechanic === 'multiselect') {
+      const MultiSelect = () => {
+        const [selected, setSelected] = useState([]);
+        const toggle = (id) => setSelected(s => s.includes(id) ? s.filter(x=>x!==id) : [...s, id]);
+        const confirm = () => {
+          if (selected.length === 0) return;
+          const total = selected.reduce((sum,id) => sum + (q.options.find(o=>o.id===id)?.score||0), 0);
+          const maxScore = Math.max(...q.options.map(o=>o.score));
+          const normalized = Math.round((total / (selected.length * maxScore)) * 4);
+          handleAnswer(Math.min(4, Math.max(1, normalized)));
+        };
+
+        return (
+          <div>
+            <div style={{ background:`${color}18`, borderRadius:20, padding:18, marginBottom:16, border:`1px solid ${color}44` }}>
+              <div style={{ fontSize:12, color:color, fontWeight:700, letterSpacing:2, marginBottom:8 }}>☑️ เลือกทุกอันที่ตรงกับน้อง</div>
+              <h2 style={{ fontSize:18, fontWeight:700, color:'white', lineHeight:1.6 }}>{q.q}</h2>
+            </div>
+
+            <div style={{ display:'flex', flexDirection:'column', gap:10, marginBottom:16 }}>
+              {q.options.map((opt) => {
+                const isOn = selected.includes(opt.id);
+                return (
+                  <div key={opt.id} onClick={() => toggle(opt.id)} style={{
+                    padding:'15px 18px', borderRadius:16, cursor:'pointer',
+                    background: isOn ? `${color}25` : 'rgba(255,255,255,0.05)',
+                    border: `2px solid ${isOn ? color : 'rgba(255,255,255,0.12)'}`,
+                    display:'flex', alignItems:'center', gap:14, transition:'all 0.2s'
+                  }}>
+                    <div style={{
+                      width:26, height:26, borderRadius:8, flexShrink:0,
+                      background: isOn ? color : 'rgba(255,255,255,0.1)',
+                      border: `2px solid ${isOn ? color : 'rgba(255,255,255,0.2)'}`,
+                      display:'flex', alignItems:'center', justifyContent:'center',
+                      fontSize:14, transition:'all 0.2s'
+                    }}>{isOn ? '✓' : ''}</div>
+                    <span style={{ fontSize:14, color:'white', lineHeight:1.5 }}>{opt.text}</span>
+                  </div>
+                );
+              })}
+            </div>
+
+            <button
+              onClick={confirm}
+              disabled={selected.length === 0}
+              style={{
+                ...styles.btn,
+                background: selected.length > 0 ? `linear-gradient(135deg,${color},${color}99)` : 'rgba(255,255,255,0.1)',
+                color:'white', opacity: selected.length > 0 ? 1 : 0.5,
+                transition:'all 0.3s'
+              }}
+            >
+              {selected.length === 0 ? 'เลือกอย่างน้อย 1 อัน' : `✓ ยืนยัน (เลือกแล้ว ${selected.length} อัน)`}
+            </button>
+          </div>
+        );
+      };
+      return (
+        <div style={styles.container}>
+          <div style={{...styles.glowOrb, width:220, height:220, background:color, top:-60, left:'50%', transform:'translateX(-50%)'}} />
+          <div style={styles.content}>
+            <Header />
+            <MultiSelect />
+          </div>
+        </div>
+      );
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // MECHANIC E: DRAG SORT — Tests 8,12
+    // Drag items to rank order (touch + mouse), score by final position
+    // ════════════════════════════════════════════════════════════════
+    if (mechanic === 'dragsort') {
+      const DragSort = () => {
+        const [items, setItems] = useState(() => [...q.options].map((o,i) => ({...o, pos:i})));
+        const [dragging, setDragging] = useState(null);
+        const [confirmed, setConfirmed] = useState(false);
+
+        const moveUp   = (id) => setItems(arr => { const i=arr.findIndex(x=>x.id===id); if(i<=0) return arr; const n=[...arr]; [n[i-1],n[i]]=[n[i],n[i-1]]; return n; });
+        const moveDown = (id) => setItems(arr => { const i=arr.findIndex(x=>x.id===id); if(i>=arr.length-1) return arr; const n=[...arr]; [n[i],n[i+1]]=[n[i+1],n[i]]; return n; });
+
+        const confirm = () => {
+          // Top item score = highest weight
+          const topItem = items[0];
+          setConfirmed(true);
+          setTimeout(() => handleAnswer(topItem.score), 400);
+        };
+
+        const rankColors = ['#FFD700','#C0C0C0','#CD7F32','rgba(255,255,255,0.3)'];
+        const rankLabels = ['1st','2nd','3rd','4th'];
+
+        return (
+          <div>
+            <div style={{ background:`${color}18`, borderRadius:20, padding:18, marginBottom:16, border:`1px solid ${color}44` }}>
+              <div style={{ fontSize:12, color:color, fontWeight:700, letterSpacing:2, marginBottom:8 }}>🔀 เรียงลำดับให้ตรงกับน้อง</div>
+              <h2 style={{ fontSize:17, fontWeight:700, color:'white', lineHeight:1.6 }}>{q.q}</h2>
+              <div style={{ fontSize:11, color:'rgba(255,255,255,0.4)', marginTop:8 }}>อันที่ตรงที่สุดไว้บนสุด → กด ↑↓ เพื่อเรียง</div>
+            </div>
+
+            <div style={{ display:'flex', flexDirection:'column', gap:8, marginBottom:16 }}>
+              {items.map((item, idx) => (
+                <div key={item.id} style={{
+                  display:'flex', alignItems:'center', gap:12,
+                  padding:'14px 16px', borderRadius:16,
+                  background: idx === 0 ? `${color}22` : 'rgba(255,255,255,0.06)',
+                  border:`1.5px solid ${idx === 0 ? color : 'rgba(255,255,255,0.1)'}`,
+                  transition:'all 0.25s',
+                  opacity: confirmed ? (idx===0 ? 1 : 0.4) : 1
+                }}>
+                  <div style={{
+                    width:32, height:32, borderRadius:10, flexShrink:0,
+                    background: rankColors[idx], display:'flex', alignItems:'center', justifyContent:'center',
+                    fontSize:11, fontWeight:800, color: idx < 3 ? '#1a1a2e' : 'rgba(255,255,255,0.4)'
+                  }}>{rankLabels[idx]}</div>
+                  <span style={{ flex:1, fontSize:13, color:'white', lineHeight:1.5 }}>{item.text}</span>
+                  <div style={{ display:'flex', flexDirection:'column', gap:4, flexShrink:0 }}>
+                    <button onClick={() => moveUp(item.id)} disabled={idx===0} style={{ width:28, height:28, borderRadius:8, border:'none', background: idx===0 ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.15)', color:'white', cursor: idx===0 ? 'default' : 'pointer', fontSize:13, display:'flex', alignItems:'center', justifyContent:'center' }}>↑</button>
+                    <button onClick={() => moveDown(item.id)} disabled={idx===items.length-1} style={{ width:28, height:28, borderRadius:8, border:'none', background: idx===items.length-1 ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.15)', color:'white', cursor: idx===items.length-1 ? 'default' : 'pointer', fontSize:13, display:'flex', alignItems:'center', justifyContent:'center' }}>↓</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button onClick={confirm} disabled={confirmed} style={{
+              ...styles.btn,
+              background:`linear-gradient(135deg,${color},${color}88)`,
+              color:'white', opacity: confirmed ? 0.6 : 1
+            }}>
+              {confirmed ? '⏳ กำลังบันทึก...' : `✓ ยืนยันการเรียงลำดับ`}
+            </button>
+          </div>
+        );
+      };
+      return (
+        <div style={styles.container}>
+          <div style={{...styles.glowOrb, width:220, height:220, background:color, bottom:-60, left:-60}} />
+          <div style={styles.content}>
+            <Header />
+            <DragSort />
+          </div>
+        </div>
+      );
+    }
+
+    // fallback
+    return null;
   };
 
   // Lead Gate Modal
@@ -3018,437 +3382,9 @@ export default function MhaStoryApp() {
                   setScreen('topic-intro');
                 }
               }}
-              style={{ ...styles.btn, ...styles.btnPrimary, marginBottom: 12 }}
+              style={{ ...styles.btn, ...styles.btnPrimary }}
             >
               🐾 ทำ Test ถัดไป
-            </button>
-          )}
-
-          {/* Full DNA Report Button */}
-          <button
-            onClick={() => setScreen('full-dna')}
-            style={{
-              ...styles.btn,
-              background: completedCount >= 10
-                ? 'linear-gradient(135deg, #FFD700, #FF6B6B)'
-                : 'rgba(255,255,255,0.08)',
-              color: 'white',
-              border: completedCount >= 10 ? 'none' : '1.5px solid rgba(255,255,255,0.2)',
-              fontWeight: 600,
-              marginBottom: 12,
-              boxShadow: completedCount >= 10 ? '0 4px 20px rgba(255,215,0,0.3)' : 'none'
-            }}
-          >
-            🧬 {completedCount >= 10 ? 'Full DNA Report + Archetype 🎉' : `DNA Report (${completedCount}/12)`}
-          </button>
-        </div>
-      </div>
-    );
-  };
-
-  // ─── LINE LIFF init ───────────────────────────────────────────────────────
-  useEffect(() => {
-    const initLiff = async () => {
-      try {
-        const liffId = process.env.NEXT_PUBLIC_LIFF_ID;
-        if (!liffId) return;
-        const liff = (await import('@line/liff')).default;
-        await liff.init({ liffId });
-        if (liff.isLoggedIn()) {
-          const profile = await liff.getProfile();
-          setLeadInfo(prev => ({
-            ...prev,
-            name: prev.name || profile.displayName,
-            lineUserId: profile.userId,
-            lineAvatar: profile.pictureUrl
-          }));
-        }
-        window.__liff = liff;
-      } catch(e) { /* LINE LIFF not available */ }
-    };
-    initLiff();
-  }, []);
-
-  // ─── 8 Overall Archetypes (computed from 5 dimension averages) ───────────
-  const getOverallArchetype = (dimAvg) => {
-    const bond  = dimAvg['BOND']  || 0;
-    const drive = dimAvg['DRIVE'] || 0;
-    const mind  = dimAvg['MIND']  || 0;
-    const nerve = dimAvg['NERVE'] || 0;
-    const wild  = dimAvg['WILD']  || 0;
-
-    // Determine top 2 dimensions
-    const dims = [
-      { name:'BOND',  val:bond  },
-      { name:'DRIVE', val:drive },
-      { name:'MIND',  val:mind  },
-      { name:'NERVE', val:nerve },
-      { name:'WILD',  val:wild  }
-    ].sort((a,b) => b.val - a.val);
-
-    const top1 = dims[0].name;
-    const top2 = dims[1].name;
-    const key = [top1, top2].sort().join('_');
-
-    const archetypes = {
-      'BOND_MIND':  { name:'Soul Companion',   emoji:'🌟', color:'#FFD700', tagline:'เพื่อนที่เข้าใจทุกความรู้สึก', desc:'น้องมี bond สูงและ social cognition ยอดเยี่ยม — อ่านใจคุณออกและรักอย่างลึกซึ้ง', gene:'OXTR × WBSCR17' },
-      'BOND_DRIVE': { name:'Loyal Energizer',  emoji:'⚡', color:'#FF6B6B', tagline:'พลังงานสูง รักเจ้าของสุด', desc:'น้องรักคุณอย่างเต็มเปี่ยมและมีพลังงานไม่มีวันหมด ชอบทำกิจกรรมร่วมกัน', gene:'OXTR × POMC' },
-      'BOND_NERVE': { name:'Gentle Guardian',  emoji:'🛡️', color:'#9B59B6', tagline:'อ่อนโยน ปกป้อง และซื่อสัตย์', desc:'น้องผูกพันลึกและมี emotional sensitivity สูง รักษาความสัมพันธ์อย่างระมัดระวัง', gene:'OXTR × SLC6A4' },
-      'BOND_WILD':  { name:'Free Spirit',      emoji:'🌿', color:'#2ECC71', tagline:'รักอิสระแต่รักคุณมากกว่า', desc:'น้องมีสัญชาตญาณแกร่งและ bond ลึก — ชอบผจญภัยแต่จะกลับมาหาคุณเสมอ', gene:'OXTR × DRD4' },
-      'DRIVE_MIND': { name:'Clever Performer', emoji:'🎭', color:'#4ECDC4', tagline:'ฉลาดและกระตือรือร้นสุดๆ', desc:'น้องเรียนรู้เร็ว พลังงานสูง และต้องการ mental stimulation สม่ำเสมอ', gene:'POMC × WBSCR17' },
-      'DRIVE_WILD': { name:'Wild Adventurer',  emoji:'🦁', color:'#E67E22', tagline:'นักผจญภัยพันธุ์แท้', desc:'น้องมีพลังงานสูงและสัญชาตญาณแกร่ง — ต้องการการออกกำลังกายและการสำรวจสิ่งใหม่', gene:'POMC × DRD4' },
-      'MIND_NERVE': { name:'Wise Sentinel',    emoji:'🔮', color:'#3498DB', tagline:'สังเกตการณ์ อ่านสถานการณ์เก่ง', desc:'น้องฉลาดและระมัดระวัง ประเมินสถานการณ์ก่อนตัดสินใจ — เชื่อถือได้มาก', gene:'WBSCR17 × SLC6A4' },
-      'NERVE_WILD': { name:'Ancient Soul',     emoji:'🌙', color:'#8E44AD', tagline:'วิญญาณเก่า สัญชาตญาณลึก', desc:'น้องมี emotional depth และสัญชาตญาณดั้งเดิมที่แกร่ง — เป็นน้องที่พิเศษมาก', gene:'SLC6A4 × DRD4' },
-    };
-
-    return archetypes[key] || archetypes['BOND_MIND'];
-  };
-
-  // ─── DNA Radar Chart (Canvas, pentagon) ──────────────────────────────────
-  const DNARadarChart = ({ dimAvg, size = 200 }) => {
-    const canvasRef = useRef(null);
-
-    useEffect(() => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      const cx = size / 2, cy = size / 2;
-      const r = size * 0.38;
-      const dims = ['BOND','DRIVE','MIND','NERVE','WILD'];
-      const colors = { BOND:'#FFD93D', DRIVE:'#FF6B6B', MIND:'#4ECDC4', NERVE:'#9B59B6', WILD:'#2ECC71' };
-      const n = 5;
-
-      ctx.clearRect(0, 0, size, size);
-
-      // Draw background webs
-      for (let level = 1; level <= 4; level++) {
-        ctx.beginPath();
-        for (let i = 0; i < n; i++) {
-          const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
-          const rr = r * (level / 4);
-          const x = cx + rr * Math.cos(angle);
-          const y = cy + rr * Math.sin(angle);
-          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-        }
-        ctx.closePath();
-        ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
-
-      // Draw axes
-      for (let i = 0; i < n; i++) {
-        const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.lineTo(cx + r * Math.cos(angle), cy + r * Math.sin(angle));
-        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
-
-      // Draw filled polygon
-      ctx.beginPath();
-      for (let i = 0; i < n; i++) {
-        const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
-        const val = (dimAvg[dims[i]] || 0) / 100;
-        const rr = r * Math.max(val, 0.05);
-        const x = cx + rr * Math.cos(angle);
-        const y = cy + rr * Math.sin(angle);
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      }
-      ctx.closePath();
-      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-      grad.addColorStop(0, 'rgba(255,215,0,0.5)');
-      grad.addColorStop(1, 'rgba(255,107,107,0.2)');
-      ctx.fillStyle = grad;
-      ctx.fill();
-      ctx.strokeStyle = '#FFD700';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      // Draw dots + labels
-      for (let i = 0; i < n; i++) {
-        const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
-        const val = (dimAvg[dims[i]] || 0) / 100;
-        const rr = r * Math.max(val, 0.05);
-        const x = cx + rr * Math.cos(angle);
-        const y = cy + rr * Math.sin(angle);
-
-        ctx.beginPath();
-        ctx.arc(x, y, 4, 0, Math.PI * 2);
-        ctx.fillStyle = colors[dims[i]];
-        ctx.fill();
-
-        // Labels
-        const lx = cx + (r + 22) * Math.cos(angle);
-        const ly = cy + (r + 22) * Math.sin(angle);
-        ctx.font = `bold 10px sans-serif`;
-        ctx.fillStyle = colors[dims[i]];
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(dims[i], lx, ly);
-      }
-    }, [dimAvg, size]);
-
-    return <canvas ref={canvasRef} width={size} height={size} style={{ display:'block' }} />;
-  };
-
-  // ─── Share Card Generator (Canvas → image) ───────────────────────────────
-  const generateShareCard = async (dimAvg, archetype) => {
-    const canvas = document.createElement('canvas');
-    canvas.width = 800; canvas.height = 800;
-    const ctx = canvas.getContext('2d');
-    const dogName = leadInfo.dogName || 'น้องหมา';
-
-    // Background gradient
-    const bg = ctx.createLinearGradient(0, 0, 800, 800);
-    bg.addColorStop(0, '#0f0f23');
-    bg.addColorStop(1, '#1a1a3e');
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, 800, 800);
-
-    // Glow orb
-    const glow = ctx.createRadialGradient(400, 200, 0, 400, 200, 350);
-    glow.addColorStop(0, `${archetype.color}44`);
-    glow.addColorStop(1, 'transparent');
-    ctx.fillStyle = glow;
-    ctx.fillRect(0, 0, 800, 800);
-
-    // Border
-    ctx.strokeStyle = `${archetype.color}66`;
-    ctx.lineWidth = 3;
-    ctx.strokeRect(20, 20, 760, 760);
-
-    // Brand
-    ctx.font = 'bold 18px sans-serif';
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-    ctx.textAlign = 'center';
-    ctx.fillText('🐾 MHA\' STORY — DOG DNA', 400, 70);
-
-    // Archetype emoji (big)
-    ctx.font = '120px serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(archetype.emoji, 400, 230);
-
-    // Dog name
-    ctx.font = 'bold 42px sans-serif';
-    ctx.fillStyle = 'white';
-    ctx.fillText(dogName, 400, 300);
-
-    // Archetype name
-    ctx.font = 'bold 32px sans-serif';
-    ctx.fillStyle = archetype.color;
-    ctx.fillText(archetype.name, 400, 350);
-
-    // Tagline
-    ctx.font = '20px sans-serif';
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    ctx.fillText(archetype.tagline, 400, 395);
-
-    // Divider
-    ctx.strokeStyle = `${archetype.color}55`;
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(100, 420); ctx.lineTo(700, 420); ctx.stroke();
-
-    // Dimension bars
-    const dims = ['BOND','DRIVE','MIND','NERVE','WILD'];
-    const dimColors = { BOND:'#FFD93D', DRIVE:'#FF6B6B', MIND:'#4ECDC4', NERVE:'#9B59B6', WILD:'#2ECC71' };
-    const dimEmojis = { BOND:'💛', DRIVE:'⚡', MIND:'🧠', NERVE:'🛡️', WILD:'🌍' };
-    dims.forEach((d, i) => {
-      const y = 455 + i * 52;
-      const val = (dimAvg[d] || 0) / 100;
-      ctx.font = '16px sans-serif';
-      ctx.fillStyle = dimColors[d];
-      ctx.textAlign = 'left';
-      ctx.fillText(`${dimEmojis[d]} ${d}`, 80, y + 12);
-      ctx.fillStyle = 'rgba(255,255,255,0.08)';
-      ctx.beginPath(); ctx.roundRect(200, y, 480, 18, 9); ctx.fill();
-      ctx.fillStyle = dimColors[d];
-      ctx.beginPath(); ctx.roundRect(200, y, 480 * Math.max(val, 0.02), 18, 9); ctx.fill();
-      ctx.font = 'bold 14px sans-serif';
-      ctx.fillStyle = 'white';
-      ctx.textAlign = 'right';
-      ctx.fillText(`${dimAvg[d] || 0}%`, 720, y + 13);
-    });
-
-    // Footer
-    ctx.font = '14px sans-serif';
-    ctx.fillStyle = 'rgba(255,255,255,0.3)';
-    ctx.textAlign = 'center';
-    ctx.fillText('understandomci.com/mha-story', 400, 770);
-
-    return canvas.toDataURL('image/png');
-  };
-
-  // ─── Full DNA Report Screen (with Radar + Archetype + Share Card) ─────────
-  const FullDNAReportScreen = () => {
-    const dogName = leadInfo.dogName || 'น้องหมา';
-    const [shareImg, setShareImg] = useState(null);
-    const [generating, setGenerating] = useState(false);
-    const [shared, setShared] = useState(false);
-
-    // Compute dimension averages
-    const dimScores = {};
-    allTopics.forEach(t => {
-      const r = completedTopics[t.id];
-      if (!r) return;
-      if (!dimScores[t.dimension]) dimScores[t.dimension] = [];
-      dimScores[t.dimension].push(r.score);
-    });
-    const dimAvg = {};
-    Object.entries(dimScores).forEach(([d, arr]) => {
-      dimAvg[d] = Math.round(arr.reduce((a,b)=>a+b,0)/arr.length);
-    });
-
-    const completedCount = Object.keys(completedTopics).length;
-    const archetype = completedCount >= 10 ? getOverallArchetype(dimAvg) : null;
-
-    const handleGenerateCard = async () => {
-      setGenerating(true);
-      const img = await generateShareCard(dimAvg, archetype || getOverallArchetype(dimAvg));
-      setShareImg(img);
-      setGenerating(false);
-    };
-
-    const handleShareCard = async () => {
-      if (!shareImg) return;
-      const liff = window.__liff;
-      if (liff?.isInClient()) {
-        // Share via LINE
-        try {
-          await liff.shareTargetPicker([{
-            type: 'image',
-            originalContentUrl: shareImg,
-            previewImageUrl: shareImg
-          }]);
-          setShared(true);
-          return;
-        } catch(e) {}
-      }
-      // Fallback: download image
-      const a = document.createElement('a');
-      a.href = shareImg;
-      a.download = `${dogName}-dna-profile.png`;
-      a.click();
-      setShared(true);
-    };
-
-    return (
-      <div style={{...styles.container, background: 'linear-gradient(180deg,#0a0a1a 0%,#1a1a3e 100%)'}}>
-        <div style={{...styles.glowOrb, width:400, height:400, background: archetype?.color || '#FFD700', top:-150, left:'50%', transform:'translateX(-50%)'}} />
-        <div style={styles.content}>
-
-          {/* Header */}
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:24 }}>
-            <button onClick={() => setScreen('dashboard')} style={{ background:'none', border:'none', fontSize:24, cursor:'pointer', color:'white' }}>←</button>
-            <span style={{ fontSize:13, letterSpacing:3, color:'rgba(255,255,255,0.5)' }}>🧬 FULL DNA REPORT</span>
-            <div style={{ width:24 }} />
-          </div>
-
-          {/* Dog + Archetype Hero */}
-          <div style={{ textAlign:'center', marginBottom:24 }}>
-            <div style={{ fontSize:64, marginBottom:8, filter:`drop-shadow(0 0 30px ${archetype?.color || '#FFD700'}88)` }}>
-              {archetype?.emoji || '🧬'}
-            </div>
-            <h1 style={{ fontSize:24, fontWeight:800, color:'white', marginBottom:4 }}>{dogName}</h1>
-            {archetype ? (
-              <>
-                <div style={{ display:'inline-block', padding:'6px 18px', borderRadius:20, background:`${archetype.color}22`, border:`1.5px solid ${archetype.color}66`, marginBottom:8 }}>
-                  <span style={{ fontSize:14, fontWeight:700, color:archetype.color }}>{archetype.name}</span>
-                </div>
-                <div style={{ fontSize:13, color:'rgba(255,255,255,0.6)', fontStyle:'italic' }}>"{archetype.tagline}"</div>
-                <div style={{ fontSize:11, color:'rgba(255,255,255,0.3)', marginTop:6 }}>Gene signature: {archetype.gene}</div>
-              </>
-            ) : (
-              <div style={{ fontSize:13, color:'rgba(255,255,255,0.5)' }}>ทำให้ครบ 10+ tests เพื่อ unlock Overall Archetype</div>
-            )}
-          </div>
-
-          {/* DNA Radar Chart */}
-          <div style={{ ...styles.darkCard, marginBottom:20, textAlign:'center' }}>
-            <div style={{ fontSize:14, fontWeight:600, color:'#FFD700', marginBottom:12 }}>🕸️ DNA Radar — 5 Dimensions</div>
-            <div style={{ display:'flex', justifyContent:'center' }}>
-              <DNARadarChart dimAvg={dimAvg} size={220} />
-            </div>
-            {archetype && (
-              <p style={{ fontSize:13, color:'rgba(255,255,255,0.7)', lineHeight:1.7, marginTop:14, margin:0 }}>
-                {archetype.desc}
-              </p>
-            )}
-          </div>
-
-          {/* Dimension Score Bars */}
-          <div style={{ ...styles.darkCard, marginBottom:20 }}>
-            <div style={{ fontSize:14, fontWeight:600, color:'#4ECDC4', marginBottom:16 }}>📊 Dimension Breakdown</div>
-            {dimensionInfo.map(d => {
-              const avg = dimAvg[d.name];
-              return (
-                <div key={d.name} style={{ marginBottom:16 }}>
-                  <div style={{ display:'flex', justifyContent:'space-between', marginBottom:6 }}>
-                    <span style={{ fontSize:13, fontWeight:600, color:'white' }}>{d.emoji} {d.name}</span>
-                    <span style={{ fontSize:13, fontWeight:700, color: avg != null ? d.color : 'rgba(255,255,255,0.3)' }}>
-                      {avg != null ? `${avg}%` : '—'}
-                    </span>
-                  </div>
-                  <div style={{ height:8, background:'rgba(255,255,255,0.08)', borderRadius:4, overflow:'hidden' }}>
-                    <div style={{ width:`${avg || 0}%`, height:'100%', background:`linear-gradient(90deg,${d.color},${d.color}88)`, borderRadius:4, transition:'width 1s ease' }} />
-                  </div>
-                  <div style={{ fontSize:10, color:'rgba(255,255,255,0.3)', marginTop:3 }}>{d.gene}</div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* All Test Results */}
-          <div style={{ ...styles.darkCard, marginBottom:20 }}>
-            <div style={{ fontSize:14, fontWeight:600, color:'#9B59B6', marginBottom:16 }}>🔬 All Test Results ({completedCount}/12)</div>
-            {allTopics.map(t => {
-              const r = completedTopics[t.id];
-              const p = r ? getPersonality(r.score, t.id) : null;
-              return (
-                <div key={t.id}
-                  onClick={() => { if (r) { setViewingResult(t); setRevealStep(5); setScreen('result'); } else { setCurrentTopic(t); setScreen('topic-intro'); } }}
-                  style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 0', borderBottom:'1px solid rgba(255,255,255,0.05)', cursor:'pointer', opacity: r ? 1 : 0.4 }}
-                >
-                  <div style={{ width:36, height:36, borderRadius:10, flexShrink:0, background: r ? `${t.color}22` : 'rgba(255,255,255,0.05)', border:`1.5px solid ${r ? t.color : 'rgba(255,255,255,0.1)'}`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:16 }}>
-                    {r ? t.emoji : '🔒'}
-                  </div>
-                  <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ fontSize:12, fontWeight:600, color:'white' }}>{t.name}</div>
-                    <div style={{ fontSize:10, color:'rgba(255,255,255,0.4)' }}>{r ? p?.type : 'ยังไม่ได้ทำ'}</div>
-                  </div>
-                  {r && <div style={{ fontSize:15, fontWeight:800, color:t.color, flexShrink:0 }}>{r.score}%</div>}
-                  {!r && <div style={{ fontSize:11, color:'rgba(255,255,255,0.3)', flexShrink:0 }}>ทำ →</div>}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Share Card Section */}
-          <div style={{ ...styles.darkCard, marginBottom:20, textAlign:'center', background:'linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,107,107,0.08))', border:'1.5px solid rgba(255,215,0,0.3)' }}>
-            <div style={{ fontSize:14, fontWeight:600, color:'#FFD700', marginBottom:12 }}>🎴 DNA Share Card</div>
-            {shareImg ? (
-              <>
-                <img src={shareImg} alt="DNA Card" style={{ width:'100%', borderRadius:12, marginBottom:14 }} />
-                <button onClick={handleShareCard} style={{ ...styles.btn, background: shared ? '#2ECC71' : 'linear-gradient(135deg,#FFD700,#FF6B6B)', color:'white', marginBottom:8 }}>
-                  {shared ? '✅ แชร์แล้ว!' : window.__liff?.isInClient() ? '📤 แชร์ผ่าน LINE' : '⬇️ ดาวน์โหลด Card'}
-                </button>
-              </>
-            ) : (
-              <>
-                <div style={{ fontSize:13, color:'rgba(255,255,255,0.6)', marginBottom:14 }}>สร้าง Share Card รูป DNA Profile ของน้อง</div>
-                <button onClick={handleGenerateCard} disabled={generating} style={{ ...styles.btn, background:'linear-gradient(135deg,#FFD700,#FF6B6B)', color:'white', opacity: generating ? 0.7 : 1 }}>
-                  {generating ? '⏳ กำลังสร้าง...' : '🎨 สร้าง Share Card'}
-                </button>
-              </>
-            )}
-          </div>
-
-          {/* LINE Share CTA */}
-          {completedCount < 12 && (
-            <button onClick={() => { const next = allTopics.find(t => !completedTopics[t.id]); if(next){ setCurrentTopic(next); setScreen('topic-intro'); } }} style={{ ...styles.btn, ...styles.btnPrimary, marginBottom:12 }}>
-              🐾 ทำ Test ต่อ ({completedCount}/12)
             </button>
           )}
         </div>
@@ -3465,7 +3401,6 @@ export default function MhaStoryApp() {
       {screen === 'result' && <ResultScreen />}
       {screen === 'auth' && <AuthScreen />}
       {screen === 'dashboard' && <DashboardScreen />}
-      {screen === 'full-dna' && <FullDNAReportScreen />}
       
       {showLeadGate && <LeadGateModal />}
       {showBadgeModal && selectedBadge && <BadgePreviewModal />}
