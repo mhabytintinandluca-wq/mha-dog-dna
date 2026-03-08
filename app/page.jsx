@@ -1953,13 +1953,13 @@ export default function MhaStoryApp() {
     }
   };
 
-  // ─── Mechanic assignment per topic ───────────────────────────────────────
-  // 'buttons'      → Tests 1,2,6,7  (4-choice card, styled per topic)
-  // 'swipe'        → Tests 3,9      (swipe left=No / right=Yes)
-  // 'reveal'       → Tests 4,10     (tap to reveal frame-by-frame)
-  // 'multiselect'  → Tests 5,11     (tap multiple, confirm)
-  // 'dragsort'     → Tests 8,12     (drag to rank/sort)
-  const MECHANIC = { 1:'buttons',2:'buttons',3:'swipe',4:'reveal',5:'multiselect',6:'buttons',7:'buttons',8:'dragsort',9:'swipe',10:'reveal',11:'multiselect',12:'dragsort' };
+  // MECHANIC MAP — 5 distinct interaction types
+  // buttons:     Tests 1,2,6,7  → styled 4-choice cards
+  // swipe:       Tests 3,9      → swipe left/right (touch + tap fallback)
+  // reveal:      Tests 4,10     → tap to uncover options one by one
+  // multiselect: Tests 5,11     → tap multiple, then confirm
+  // dragsort:    Tests 8,12     → reorder with ↑↓ buttons, then confirm
+  const MECHANIC = {1:'buttons',2:'buttons',3:'swipe',4:'reveal',5:'multiselect',6:'buttons',7:'buttons',8:'dragsort',9:'swipe',10:'reveal',11:'multiselect',12:'dragsort'};
 
   const QuizScreen = () => {
     const q = quizQuestions[currentQuestion];
@@ -1967,52 +1967,49 @@ export default function MhaStoryApp() {
     const color = currentTopic.color;
     const dogName = leadInfo.dogName || 'น้องหมา';
 
-    // ── Shared Header ─────────────────────────────────────────────────────
     const Header = () => (
       <>
-        <div style={{ display:'flex', alignItems:'center', marginBottom:16 }}>
-          <button onClick={() => setScreen('topic-intro')} style={{ background:'none', border:'none', fontSize:24, cursor:'pointer', color:'white' }}>←</button>
-          <div style={{ flex:1, textAlign:'center' }}>
-            <span style={{ fontSize:20 }}>{currentTopic.emoji}</span>
-            <span style={{ fontSize:13, color:'rgba(255,255,255,0.6)', marginLeft:8 }}>{currentTopic.name}</span>
+        <div style={{display:'flex',alignItems:'center',marginBottom:16}}>
+          <button onClick={() => setScreen('topic-intro')} style={{background:'none',border:'none',fontSize:24,cursor:'pointer',color:'white'}}>←</button>
+          <div style={{flex:1,textAlign:'center'}}>
+            <span style={{fontSize:20}}>{currentTopic.emoji}</span>
+            <span style={{fontSize:13,color:'rgba(255,255,255,0.6)',marginLeft:8}}>{currentTopic.name}</span>
           </div>
-          <span style={{ background:color, color:'white', padding:'6px 14px', borderRadius:20, fontSize:14, fontWeight:700 }}>{currentQuestion+1}/10</span>
+          <span style={{background:color,color:'white',padding:'6px 14px',borderRadius:20,fontSize:14,fontWeight:700}}>{currentQuestion+1}/10</span>
         </div>
-        <div style={{ height:6, background:'rgba(255,255,255,0.1)', borderRadius:3, marginBottom:20, overflow:'hidden' }}>
-          <div style={{ width:`${((currentQuestion+1)/10)*100}%`, height:'100%', background:`linear-gradient(90deg,${color},#FFD93D)`, borderRadius:3, transition:'width 0.5s ease' }} />
+        <div style={{height:6,background:'rgba(255,255,255,0.1)',borderRadius:3,marginBottom:20,overflow:'hidden'}}>
+          <div style={{width:`${((currentQuestion+1)/10)*100}%`,height:'100%',background:`linear-gradient(90deg,${color},#FFD93D)`,borderRadius:3,transition:'width 0.5s ease'}}/>
         </div>
       </>
     );
 
-    // ════════════════════════════════════════════════════════════════
-    // MECHANIC A: BUTTONS — Tests 1,2,6,7
-    // 4 choices, styled differently per topic
-    // ════════════════════════════════════════════════════════════════
+    // ── A: BUTTONS (Tests 1,2,6,7) ─────────────────────────────────────────
     if (mechanic === 'buttons') {
-      const cardStyles = {
-        1:  { bg:'rgba(255,255,255,0.96)', textColor:'#1a1a2e', btnColors:['#FF6B6B','#FF8E53','#4ECDC4','#45B7D1'] },
-        2:  { bg:'rgba(255,255,255,0.96)', textColor:'#1a1a2e', btnColors:['#FF6B9D','#C850C0','#4158D0','#48C9B0'] },
-        6:  { bg:'rgba(20,20,40,0.95)',    textColor:'white',   btnColors:['#4ECDC4','#45B7D1','#96CEB4','#FFEAA7'] },
-        7:  { bg:'rgba(20,20,40,0.95)',    textColor:'white',   btnColors:['#A29BFE','#6C5CE7','#FD79A8','#FDCB6E'] },
+      const palettes = {
+        1: ['#FF6B6B','#FF8E53','#4ECDC4','#45B7D1'],
+        2: ['#FF6B9D','#C850C0','#4158D0','#48C9B0'],
+        6: ['#4ECDC4','#45B7D1','#96CEB4','#FFEAA7'],
+        7: ['#A29BFE','#6C5CE7','#FD79A8','#FDCB6E'],
       };
-      const cs = cardStyles[currentTopic.id] || cardStyles[1];
+      const pal = palettes[currentTopic.id] || palettes[1];
+      const isDark = [6,7].includes(currentTopic.id);
       return (
         <div style={styles.container}>
-          <div style={{...styles.glowOrb, width:250, height:250, background:color, top:-60, right:-80}} />
+          <div style={{...styles.glowOrb,width:250,height:250,background:color,top:-60,right:-80}}/>
           <div style={styles.content}>
-            <Header />
-            <div style={{ background:cs.bg, borderRadius:24, padding:24, boxShadow:'0 20px 60px rgba(0,0,0,0.3)' }}>
-              <h2 style={{ fontSize:19, fontWeight:700, color:cs.textColor, lineHeight:1.6, marginBottom:24 }}>{q.q}</h2>
-              <div style={{ display:'flex', flexDirection:'column', gap:11 }}>
+            <Header/>
+            <div style={{background: isDark ? 'rgba(20,20,40,0.95)' : 'rgba(255,255,255,0.97)', borderRadius:24,padding:24,boxShadow:'0 20px 60px rgba(0,0,0,0.3)'}}>
+              <h2 style={{fontSize:19,fontWeight:700,color: isDark ? 'white' : '#1a1a2e',lineHeight:1.6,marginBottom:22}}>{q.q}</h2>
+              <div style={{display:'flex',flexDirection:'column',gap:11}}>
                 {q.options.map((opt,i) => (
                   <button key={opt.id} onClick={() => handleAnswer(opt.score)} style={{
-                    padding:'14px 18px', borderRadius:14, border:'none', cursor:'pointer',
-                    background:cs.btnColors[i], color:'white', fontSize:15, fontWeight:600,
-                    textAlign:'left', lineHeight:1.4, boxShadow:'0 4px 14px rgba(0,0,0,0.18)',
-                    transition:'all 0.18s', fontFamily:'inherit'
+                    padding:'14px 18px',borderRadius:14,border:'none',cursor:'pointer',
+                    background:pal[i],color:'white',fontSize:15,fontWeight:600,
+                    textAlign:'left',lineHeight:1.4,boxShadow:'0 4px 14px rgba(0,0,0,0.18)',
+                    transition:'all 0.18s',fontFamily:'inherit'
                   }}
-                  onMouseOver={e=>{e.currentTarget.style.transform='translateX(4px) scale(1.01)';e.currentTarget.style.boxShadow='0 6px 20px rgba(0,0,0,0.28)';}}
-                  onMouseOut={e=>{e.currentTarget.style.transform='none';e.currentTarget.style.boxShadow='0 4px 14px rgba(0,0,0,0.18)';}}
+                  onMouseOver={e=>{e.currentTarget.style.transform='translateX(4px)';}}
+                  onMouseOut={e=>{e.currentTarget.style.transform='none';}}
                   >{opt.text}</button>
                 ))}
               </div>
@@ -2022,344 +2019,228 @@ export default function MhaStoryApp() {
       );
     }
 
-    // ════════════════════════════════════════════════════════════════
-    // MECHANIC B: SWIPE — Tests 3,9
-    // Card swipe left (No/ไม่เลย) or right (Yes/บ่อยมาก)
-    // Touch + mouse drag supported
-    // ════════════════════════════════════════════════════════════════
+    // ── B: SWIPE (Tests 3,9) ───────────────────────────────────────────────
     if (mechanic === 'swipe') {
       const SwipeCard = () => {
-        const [drag, setDrag] = useState({ x:0, dragging:false, startX:0 });
-        const [decided, setDecided] = useState(null);
-        const cardRef = useRef(null);
+        const [dx, setDx] = useState(0);
+        const [dragging, setDragging] = useState(false);
+        const [startX, setStartX] = useState(0);
+        const [gone, setGone] = useState(null);
+        const threshold = 75;
 
-        const threshold = 80;
-        const rotate = drag.x / 12;
-        const opacity = Math.max(0, 1 - Math.abs(drag.x) / 300);
-
-        const decide = (dir) => {
-          // dir: 'yes'=right=score 4/3, 'no'=left=score 1/2
-          // Use first 2 options for No, last 2 for Yes based on drag intensity
-          const isStrong = Math.abs(drag.x) > threshold * 1.5;
+        const commit = (dir) => {
+          if (gone) return;
+          const strong = Math.abs(dx) > threshold * 1.6;
           let score;
-          if (dir === 'yes') score = isStrong ? q.options[0].score : q.options[1].score;
-          else               score = isStrong ? q.options[3].score : q.options[2].score;
-          setDecided(dir);
-          setTimeout(() => handleAnswer(score), 350);
+          if (dir === 'yes') score = strong ? q.options[0].score : q.options[1].score;
+          else               score = strong ? q.options[3].score : q.options[2].score;
+          setGone(dir);
+          setTimeout(() => handleAnswer(score), 360);
         };
 
-        const onStart = (x) => setDrag({ x:0, dragging:true, startX:x });
-        const onMove  = (x) => { if(drag.dragging) setDrag(d => ({...d, x: x - d.startX})); };
-        const onEnd   = () => {
-          if (!drag.dragging) return;
-          if (drag.x >  threshold) decide('yes');
-          else if (drag.x < -threshold) decide('no');
-          else setDrag({ x:0, dragging:false, startX:0 });
+        const onEnd = () => {
+          if (!dragging) return;
+          setDragging(false);
+          if (dx > threshold) commit('yes');
+          else if (dx < -threshold) commit('no');
+          else setDx(0);
         };
 
-        const leftColor  = decided==='no'  ? '#FF6B6B' : drag.x < -30 ? '#FF6B6B' : 'rgba(255,107,107,0.3)';
-        const rightColor = decided==='yes' ? '#2ECC71' : drag.x >  30 ? '#2ECC71' : 'rgba(46,204,113,0.3)';
+        const leftActive  = dx < -25 || gone === 'no';
+        const rightActive = dx >  25 || gone === 'yes';
 
         return (
-          <div style={{ position:'relative', userSelect:'none' }}>
-            {/* Labels */}
-            <div style={{ display:'flex', justifyContent:'space-between', marginBottom:16, padding:'0 8px' }}>
-              <div style={{ display:'flex', alignItems:'center', gap:6, opacity: drag.x < -20 ? 1 : 0.4, transition:'opacity 0.2s' }}>
-                <div style={{ width:40, height:40, borderRadius:'50%', background:leftColor, display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, transition:'background 0.2s' }}>❌</div>
-                <span style={{ color:'#FF6B6B', fontWeight:700, fontSize:14 }}>ไม่เลย</span>
+          <div style={{userSelect:'none'}}>
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:14,padding:'0 4px'}}>
+              <div style={{display:'flex',alignItems:'center',gap:6,opacity:leftActive?1:0.35,transition:'opacity 0.2s'}}>
+                <div style={{width:38,height:38,borderRadius:'50%',background:leftActive?'#FF6B6B':'rgba(255,107,107,0.2)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,transition:'background 0.2s'}}>❌</div>
+                <span style={{color:'#FF6B6B',fontWeight:700,fontSize:13}}>ไม่เคย</span>
               </div>
-              <div style={{ display:'flex', alignItems:'center', gap:6, flexDirection:'row-reverse', opacity: drag.x > 20 ? 1 : 0.4, transition:'opacity 0.2s' }}>
-                <div style={{ width:40, height:40, borderRadius:'50%', background:rightColor, display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, transition:'background 0.2s' }}>✅</div>
-                <span style={{ color:'#2ECC71', fontWeight:700, fontSize:14 }}>เคยบ่อย!</span>
+              <div style={{display:'flex',alignItems:'center',gap:6,flexDirection:'row-reverse',opacity:rightActive?1:0.35,transition:'opacity 0.2s'}}>
+                <div style={{width:38,height:38,borderRadius:'50%',background:rightActive?'#2ECC71':'rgba(46,204,113,0.2)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,transition:'background 0.2s'}}>✅</div>
+                <span style={{color:'#2ECC71',fontWeight:700,fontSize:13}}>เคยบ่อย!</span>
               </div>
             </div>
 
-            {/* Swipe Card */}
             <div
-              ref={cardRef}
-              onMouseDown={e => onStart(e.clientX)}
-              onMouseMove={e => onMove(e.clientX)}
-              onMouseUp={onEnd}
-              onMouseLeave={onEnd}
-              onTouchStart={e => onStart(e.touches[0].clientX)}
-              onTouchMove={e => { e.preventDefault(); onMove(e.touches[0].clientX); }}
+              onMouseDown={e=>{setDragging(true);setStartX(e.clientX);}}
+              onMouseMove={e=>{if(dragging) setDx(e.clientX-startX);}}
+              onMouseUp={onEnd} onMouseLeave={onEnd}
+              onTouchStart={e=>{setDragging(true);setStartX(e.touches[0].clientX);}}
+              onTouchMove={e=>{e.preventDefault();if(dragging) setDx(e.touches[0].clientX-startX);}}
               onTouchEnd={onEnd}
               style={{
-                background:'rgba(255,255,255,0.97)',
-                borderRadius:24, padding:28,
-                boxShadow:`0 20px 60px rgba(0,0,0,0.35), 0 0 0 3px ${drag.x > 40 ? '#2ECC71' : drag.x < -40 ? '#FF6B6B' : 'transparent'}`,
-                transform:`translateX(${decided ? (decided==='yes'?300:-300) : drag.x}px) rotate(${decided ? (decided==='yes'?20:-20) : rotate}deg)`,
-                transition: drag.dragging ? 'box-shadow 0.1s' : 'all 0.35s cubic-bezier(0.25,0.46,0.45,0.94)',
-                cursor: drag.dragging ? 'grabbing' : 'grab',
-                touchAction:'none',
-                opacity: decided ? 0 : 1
+                background:'rgba(255,255,255,0.97)',borderRadius:24,padding:26,
+                boxShadow:`0 20px 60px rgba(0,0,0,0.35), 0 0 0 3px ${dx>40?'#2ECC71':dx<-40?'#FF6B6B':'transparent'}`,
+                transform:`translateX(${gone?(gone==='yes'?320:-320):dx}px) rotate(${gone?(gone==='yes'?18:-18):dx/14}deg)`,
+                transition:dragging?'box-shadow 0.1s':'all 0.38s cubic-bezier(0.25,0.46,0.45,0.94)',
+                cursor:dragging?'grabbing':'grab',touchAction:'none',
+                opacity:gone?0:1, marginBottom:14
               }}
             >
-              <div style={{ fontSize:13, color:color, fontWeight:700, letterSpacing:2, marginBottom:12 }}>
+              <div style={{fontSize:12,color:color,fontWeight:700,letterSpacing:2,marginBottom:10}}>
                 {currentTopic.emoji} สถานการณ์นี้เกิดกับ{dogName}ไหม?
               </div>
-              <h2 style={{ fontSize:20, fontWeight:700, color:'#1a1a2e', lineHeight:1.6, marginBottom:20 }}>{q.q}</h2>
-              <div style={{ display:'flex', justifyContent:'center', gap:8, opacity:0.5 }}>
-                <span style={{ fontSize:12, color:'#999' }}>← ปัดซ้าย ไม่เคย</span>
-                <span style={{ fontSize:12, color:'#999' }}>|</span>
-                <span style={{ fontSize:12, color:'#999' }}>เคยบ่อย ปัดขวา →</span>
-              </div>
+              <h2 style={{fontSize:19,fontWeight:700,color:'#1a1a2e',lineHeight:1.65,marginBottom:18}}>{q.q}</h2>
+              <div style={{textAlign:'center',fontSize:12,color:'#aaa'}}>← ปัดซ้าย ไม่เคย &nbsp;|&nbsp; เคยบ่อย ปัดขวา →</div>
             </div>
 
-            {/* Tap buttons fallback */}
-            <div style={{ display:'flex', gap:12, marginTop:16 }}>
-              <button onClick={() => decide('no')} style={{ flex:1, padding:'14px', borderRadius:16, border:`2px solid #FF6B6B`, background:'rgba(255,107,107,0.1)', color:'#FF6B6B', fontSize:15, fontWeight:700, cursor:'pointer', fontFamily:'inherit' }}>
-                ❌ ไม่เคย
-              </button>
-              <button onClick={() => decide('yes')} style={{ flex:1, padding:'14px', borderRadius:16, border:`2px solid #2ECC71`, background:'rgba(46,204,113,0.1)', color:'#2ECC71', fontSize:15, fontWeight:700, cursor:'pointer', fontFamily:'inherit' }}>
-                ✅ เคยบ่อย!
-              </button>
+            <div style={{display:'flex',gap:12}}>
+              <button onClick={()=>commit('no')} style={{flex:1,padding:'14px',borderRadius:16,border:'2px solid #FF6B6B',background:'rgba(255,107,107,0.1)',color:'#FF6B6B',fontSize:15,fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>❌ ไม่เคย</button>
+              <button onClick={()=>commit('yes')} style={{flex:1,padding:'14px',borderRadius:16,border:'2px solid #2ECC71',background:'rgba(46,204,113,0.1)',color:'#2ECC71',fontSize:15,fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>✅ เคยบ่อย!</button>
             </div>
           </div>
         );
       };
       return (
         <div style={styles.container}>
-          <div style={{...styles.glowOrb, width:250, height:250, background:color, top:80, left:-80}} />
-          <div style={styles.content}>
-            <Header />
-            <SwipeCard />
-          </div>
+          <div style={{...styles.glowOrb,width:250,height:250,background:color,top:80,left:-80}}/>
+          <div style={styles.content}><Header/><SwipeCard/></div>
         </div>
       );
     }
 
-    // ════════════════════════════════════════════════════════════════
-    // MECHANIC C: REVEAL — Tests 4,10
-    // Tap to uncover clues one by one, then pick answer
-    // ════════════════════════════════════════════════════════════════
+    // ── C: REVEAL (Tests 4,10) ─────────────────────────────────────────────
     if (mechanic === 'reveal') {
       const RevealCard = () => {
-        const clues = q.options.map((o,i) => ({ text: o.text, score: o.score, emoji: ['🔍','💡','🎯','⭐'][i] }));
-        const [revealed, setRevealed] = useState([]);
-        const [chosen, setChosen] = useState(null);
+        const [shown, setShown] = useState([]);
+        const [picked, setPicked] = useState(null);
+        const icons = ['🔍','💡','🎯','⭐'];
 
-        const revealNext = () => {
-          if (revealed.length < clues.length) setRevealed(r => [...r, revealed.length]);
-        };
-
-        const pick = (score) => {
-          setChosen(score);
-          setTimeout(() => handleAnswer(score), 400);
-        };
+        const pick = (score) => { setPicked(score); setTimeout(()=>handleAnswer(score),380); };
 
         return (
           <div>
-            <div style={{ background:'rgba(255,255,255,0.06)', borderRadius:20, padding:20, marginBottom:16, border:`1px solid ${color}44` }}>
-              <div style={{ fontSize:12, color:color, fontWeight:700, letterSpacing:2, marginBottom:10 }}>
-                🎬 REVEAL THE MOMENT
-              </div>
-              <h2 style={{ fontSize:18, fontWeight:700, color:'white', lineHeight:1.6 }}>{q.q}</h2>
+            <div style={{background:`${color}18`,borderRadius:20,padding:18,marginBottom:14,border:`1px solid ${color}44`}}>
+              <div style={{fontSize:11,color:color,fontWeight:700,letterSpacing:2,marginBottom:8}}>🎬 REVEAL THE MOMENT — แตะเปิดทีละอัน</div>
+              <h2 style={{fontSize:18,fontWeight:700,color:'white',lineHeight:1.6}}>{q.q}</h2>
             </div>
 
-            <div style={{ display:'flex', flexDirection:'column', gap:10, marginBottom:16 }}>
-              {clues.map((clue, i) => {
-                const isRevealed = revealed.includes(i);
-                const isChosen = chosen === clue.score;
+            <div style={{display:'flex',flexDirection:'column',gap:10,marginBottom:14}}>
+              {q.options.map((opt,i) => {
+                const isOpen = shown.includes(i);
+                const isChosen = picked === opt.score;
                 return (
-                  <div key={i}
-                    onClick={() => isRevealed ? pick(clue.score) : revealNext()}
+                  <div key={opt.id}
+                    onClick={() => isOpen ? pick(opt.score) : setShown(s=>[...s,i])}
                     style={{
-                      padding:'16px 18px', borderRadius:16, cursor:'pointer',
-                      background: isChosen ? `${color}33` : isRevealed ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.04)',
-                      border: isChosen ? `2px solid ${color}` : isRevealed ? '1.5px solid rgba(255,255,255,0.2)' : '1.5px dashed rgba(255,255,255,0.15)',
-                      transition:'all 0.3s', display:'flex', alignItems:'center', gap:14
-                    }}
-                  >
-                    <span style={{ fontSize:24, flexShrink:0 }}>{isRevealed ? clue.emoji : '❓'}</span>
-                    <div style={{ flex:1 }}>
-                      {isRevealed
-                        ? <span style={{ fontSize:14, color:'white', lineHeight:1.5 }}>{clue.text}</span>
-                        : <span style={{ fontSize:13, color:'rgba(255,255,255,0.3)' }}>แตะเพื่อเปิดเผย...</span>
-                      }
+                      padding:'15px 18px',borderRadius:16,cursor:'pointer',
+                      background: isChosen?`${color}33`:isOpen?'rgba(255,255,255,0.1)':'rgba(255,255,255,0.04)',
+                      border:`${isChosen?2:1.5}px ${isOpen?'solid':'dashed'} ${isChosen?color:isOpen?'rgba(255,255,255,0.2)':'rgba(255,255,255,0.15)'}`,
+                      display:'flex',alignItems:'center',gap:14,transition:'all 0.3s'
+                    }}>
+                    <span style={{fontSize:22,flexShrink:0}}>{isOpen?icons[i]:'❓'}</span>
+                    <div style={{flex:1}}>
+                      {isOpen
+                        ? <span style={{fontSize:14,color:'white',lineHeight:1.5}}>{opt.text}</span>
+                        : <span style={{fontSize:13,color:'rgba(255,255,255,0.3)'}}>แตะเพื่อเปิดเผย...</span>}
                     </div>
-                    {isRevealed && !chosen && (
-                      <span style={{ fontSize:11, color:color, fontWeight:700, flexShrink:0 }}>เลือก →</span>
-                    )}
+                    {isOpen && !picked && <span style={{fontSize:11,color:color,fontWeight:700,flexShrink:0}}>เลือก →</span>}
                   </div>
                 );
               })}
             </div>
-
-            {revealed.length === 0 && (
-              <button onClick={revealNext} style={{ ...styles.btn, background:`linear-gradient(135deg,${color},${color}99)`, color:'white' }}>
-                👆 แตะเพื่อเริ่มเปิดเผย
-              </button>
-            )}
-            {revealed.length > 0 && revealed.length < clues.length && !chosen && (
-              <div style={{ textAlign:'center', fontSize:13, color:'rgba(255,255,255,0.5)' }}>
-                เปิดเผยแล้ว {revealed.length}/{clues.length} — แตะเปิดต่อ หรือเลือกที่ตรงที่สุด
-              </div>
+            {shown.length === 0 && (
+              <div style={{textAlign:'center',fontSize:13,color:'rgba(255,255,255,0.45)'}}>👆 แตะกล่องแรกเพื่อเริ่ม</div>
             )}
           </div>
         );
       };
       return (
         <div style={styles.container}>
-          <div style={{...styles.glowOrb, width:220, height:220, background:color, bottom:-60, right:-60}} />
-          <div style={styles.content}>
-            <Header />
-            <RevealCard />
-          </div>
+          <div style={{...styles.glowOrb,width:220,height:220,background:color,bottom:-60,right:-60}}/>
+          <div style={styles.content}><Header/><RevealCard/></div>
         </div>
       );
     }
 
-    // ════════════════════════════════════════════════════════════════
-    // MECHANIC D: MULTI-SELECT — Tests 5,11
-    // Tap multiple options that apply, then confirm
-    // Score = sum of selected / max possible
-    // ════════════════════════════════════════════════════════════════
+    // ── D: MULTI-SELECT (Tests 5,11) ───────────────────────────────────────
     if (mechanic === 'multiselect') {
       const MultiSelect = () => {
-        const [selected, setSelected] = useState([]);
-        const toggle = (id) => setSelected(s => s.includes(id) ? s.filter(x=>x!==id) : [...s, id]);
+        const [sel, setSel] = useState([]);
+        const toggle = (id) => setSel(s => s.includes(id)?s.filter(x=>x!==id):[...s,id]);
         const confirm = () => {
-          if (selected.length === 0) return;
-          const total = selected.reduce((sum,id) => sum + (q.options.find(o=>o.id===id)?.score||0), 0);
-          const maxScore = Math.max(...q.options.map(o=>o.score));
-          const normalized = Math.round((total / (selected.length * maxScore)) * 4);
-          handleAnswer(Math.min(4, Math.max(1, normalized)));
+          if (!sel.length) return;
+          const avg = sel.reduce((sum,id)=>sum+(q.options.find(o=>o.id===id)?.score||0),0) / sel.length;
+          handleAnswer(Math.round(Math.max(1,Math.min(4,avg))));
         };
-
         return (
           <div>
-            <div style={{ background:`${color}18`, borderRadius:20, padding:18, marginBottom:16, border:`1px solid ${color}44` }}>
-              <div style={{ fontSize:12, color:color, fontWeight:700, letterSpacing:2, marginBottom:8 }}>☑️ เลือกทุกอันที่ตรงกับน้อง</div>
-              <h2 style={{ fontSize:18, fontWeight:700, color:'white', lineHeight:1.6 }}>{q.q}</h2>
+            <div style={{background:`${color}18`,borderRadius:20,padding:18,marginBottom:14,border:`1px solid ${color}44`}}>
+              <div style={{fontSize:11,color:color,fontWeight:700,letterSpacing:2,marginBottom:8}}>☑️ เลือกทุกอันที่ตรงกับน้อง</div>
+              <h2 style={{fontSize:18,fontWeight:700,color:'white',lineHeight:1.6}}>{q.q}</h2>
             </div>
-
-            <div style={{ display:'flex', flexDirection:'column', gap:10, marginBottom:16 }}>
-              {q.options.map((opt) => {
-                const isOn = selected.includes(opt.id);
+            <div style={{display:'flex',flexDirection:'column',gap:10,marginBottom:14}}>
+              {q.options.map(opt => {
+                const on = sel.includes(opt.id);
                 return (
-                  <div key={opt.id} onClick={() => toggle(opt.id)} style={{
-                    padding:'15px 18px', borderRadius:16, cursor:'pointer',
-                    background: isOn ? `${color}25` : 'rgba(255,255,255,0.05)',
-                    border: `2px solid ${isOn ? color : 'rgba(255,255,255,0.12)'}`,
-                    display:'flex', alignItems:'center', gap:14, transition:'all 0.2s'
+                  <div key={opt.id} onClick={()=>toggle(opt.id)} style={{
+                    padding:'15px 18px',borderRadius:16,cursor:'pointer',
+                    background:on?`${color}22`:'rgba(255,255,255,0.05)',
+                    border:`2px solid ${on?color:'rgba(255,255,255,0.12)'}`,
+                    display:'flex',alignItems:'center',gap:14,transition:'all 0.2s'
                   }}>
-                    <div style={{
-                      width:26, height:26, borderRadius:8, flexShrink:0,
-                      background: isOn ? color : 'rgba(255,255,255,0.1)',
-                      border: `2px solid ${isOn ? color : 'rgba(255,255,255,0.2)'}`,
-                      display:'flex', alignItems:'center', justifyContent:'center',
-                      fontSize:14, transition:'all 0.2s'
-                    }}>{isOn ? '✓' : ''}</div>
-                    <span style={{ fontSize:14, color:'white', lineHeight:1.5 }}>{opt.text}</span>
+                    <div style={{width:26,height:26,borderRadius:8,flexShrink:0,background:on?color:'rgba(255,255,255,0.1)',border:`2px solid ${on?color:'rgba(255,255,255,0.2)'}`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,color:'white',fontWeight:700,transition:'all 0.2s'}}>{on?'✓':''}</div>
+                    <span style={{fontSize:14,color:'white',lineHeight:1.5}}>{opt.text}</span>
                   </div>
                 );
               })}
             </div>
-
-            <button
-              onClick={confirm}
-              disabled={selected.length === 0}
-              style={{
-                ...styles.btn,
-                background: selected.length > 0 ? `linear-gradient(135deg,${color},${color}99)` : 'rgba(255,255,255,0.1)',
-                color:'white', opacity: selected.length > 0 ? 1 : 0.5,
-                transition:'all 0.3s'
-              }}
-            >
-              {selected.length === 0 ? 'เลือกอย่างน้อย 1 อัน' : `✓ ยืนยัน (เลือกแล้ว ${selected.length} อัน)`}
+            <button onClick={confirm} disabled={!sel.length} style={{...styles.btn,background:sel.length?`linear-gradient(135deg,${color},${color}99)`:'rgba(255,255,255,0.1)',color:'white',opacity:sel.length?1:0.5,transition:'all 0.3s'}}>
+              {sel.length?`✓ ยืนยัน (เลือก ${sel.length} อัน)`:'เลือกอย่างน้อย 1 อัน'}
             </button>
           </div>
         );
       };
       return (
         <div style={styles.container}>
-          <div style={{...styles.glowOrb, width:220, height:220, background:color, top:-60, left:'50%', transform:'translateX(-50%)'}} />
-          <div style={styles.content}>
-            <Header />
-            <MultiSelect />
-          </div>
+          <div style={{...styles.glowOrb,width:220,height:220,background:color,top:-60,left:'50%',transform:'translateX(-50%)'}}/>
+          <div style={styles.content}><Header/><MultiSelect/></div>
         </div>
       );
     }
 
-    // ════════════════════════════════════════════════════════════════
-    // MECHANIC E: DRAG SORT — Tests 8,12
-    // Drag items to rank order (touch + mouse), score by final position
-    // ════════════════════════════════════════════════════════════════
+    // ── E: DRAG SORT (Tests 8,12) ──────────────────────────────────────────
     if (mechanic === 'dragsort') {
       const DragSort = () => {
-        const [items, setItems] = useState(() => [...q.options].map((o,i) => ({...o, pos:i})));
-        const [dragging, setDragging] = useState(null);
-        const [confirmed, setConfirmed] = useState(false);
-
-        const moveUp   = (id) => setItems(arr => { const i=arr.findIndex(x=>x.id===id); if(i<=0) return arr; const n=[...arr]; [n[i-1],n[i]]=[n[i],n[i-1]]; return n; });
-        const moveDown = (id) => setItems(arr => { const i=arr.findIndex(x=>x.id===id); if(i>=arr.length-1) return arr; const n=[...arr]; [n[i],n[i+1]]=[n[i+1],n[i]]; return n; });
-
-        const confirm = () => {
-          // Top item score = highest weight
-          const topItem = items[0];
-          setConfirmed(true);
-          setTimeout(() => handleAnswer(topItem.score), 400);
-        };
-
-        const rankColors = ['#FFD700','#C0C0C0','#CD7F32','rgba(255,255,255,0.3)'];
-        const rankLabels = ['1st','2nd','3rd','4th'];
-
+        const [items, setItems] = useState([...q.options]);
+        const [done, setDone] = useState(false);
+        const up   = (i) => { if(i<=0) return; const a=[...items]; [a[i-1],a[i]]=[a[i],a[i-1]]; setItems(a); };
+        const down = (i) => { if(i>=items.length-1) return; const a=[...items]; [a[i],a[i+1]]=[a[i+1],a[i]]; setItems(a); };
+        const confirm = () => { setDone(true); setTimeout(()=>handleAnswer(items[0].score),380); };
+        const medals = ['🥇','🥈','🥉','4️⃣'];
         return (
           <div>
-            <div style={{ background:`${color}18`, borderRadius:20, padding:18, marginBottom:16, border:`1px solid ${color}44` }}>
-              <div style={{ fontSize:12, color:color, fontWeight:700, letterSpacing:2, marginBottom:8 }}>🔀 เรียงลำดับให้ตรงกับน้อง</div>
-              <h2 style={{ fontSize:17, fontWeight:700, color:'white', lineHeight:1.6 }}>{q.q}</h2>
-              <div style={{ fontSize:11, color:'rgba(255,255,255,0.4)', marginTop:8 }}>อันที่ตรงที่สุดไว้บนสุด → กด ↑↓ เพื่อเรียง</div>
+            <div style={{background:`${color}18`,borderRadius:20,padding:18,marginBottom:14,border:`1px solid ${color}44`}}>
+              <div style={{fontSize:11,color:color,fontWeight:700,letterSpacing:2,marginBottom:8}}>🔀 เรียงลำดับ — ตรงที่สุดไว้บนสุด</div>
+              <h2 style={{fontSize:17,fontWeight:700,color:'white',lineHeight:1.6}}>{q.q}</h2>
             </div>
-
-            <div style={{ display:'flex', flexDirection:'column', gap:8, marginBottom:16 }}>
-              {items.map((item, idx) => (
-                <div key={item.id} style={{
-                  display:'flex', alignItems:'center', gap:12,
-                  padding:'14px 16px', borderRadius:16,
-                  background: idx === 0 ? `${color}22` : 'rgba(255,255,255,0.06)',
-                  border:`1.5px solid ${idx === 0 ? color : 'rgba(255,255,255,0.1)'}`,
-                  transition:'all 0.25s',
-                  opacity: confirmed ? (idx===0 ? 1 : 0.4) : 1
-                }}>
-                  <div style={{
-                    width:32, height:32, borderRadius:10, flexShrink:0,
-                    background: rankColors[idx], display:'flex', alignItems:'center', justifyContent:'center',
-                    fontSize:11, fontWeight:800, color: idx < 3 ? '#1a1a2e' : 'rgba(255,255,255,0.4)'
-                  }}>{rankLabels[idx]}</div>
-                  <span style={{ flex:1, fontSize:13, color:'white', lineHeight:1.5 }}>{item.text}</span>
-                  <div style={{ display:'flex', flexDirection:'column', gap:4, flexShrink:0 }}>
-                    <button onClick={() => moveUp(item.id)} disabled={idx===0} style={{ width:28, height:28, borderRadius:8, border:'none', background: idx===0 ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.15)', color:'white', cursor: idx===0 ? 'default' : 'pointer', fontSize:13, display:'flex', alignItems:'center', justifyContent:'center' }}>↑</button>
-                    <button onClick={() => moveDown(item.id)} disabled={idx===items.length-1} style={{ width:28, height:28, borderRadius:8, border:'none', background: idx===items.length-1 ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.15)', color:'white', cursor: idx===items.length-1 ? 'default' : 'pointer', fontSize:13, display:'flex', alignItems:'center', justifyContent:'center' }}>↓</button>
+            <div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:14}}>
+              {items.map((item,i) => (
+                <div key={item.id} style={{display:'flex',alignItems:'center',gap:12,padding:'13px 16px',borderRadius:16,background:i===0?`${color}22`:'rgba(255,255,255,0.06)',border:`1.5px solid ${i===0?color:'rgba(255,255,255,0.1)'}`,transition:'all 0.25s',opacity:done?(i===0?1:0.35):1}}>
+                  <span style={{fontSize:22,flexShrink:0}}>{medals[i]}</span>
+                  <span style={{flex:1,fontSize:13,color:'white',lineHeight:1.5}}>{item.text}</span>
+                  <div style={{display:'flex',flexDirection:'column',gap:4,flexShrink:0}}>
+                    <button onClick={()=>up(i)} disabled={i===0||done} style={{width:28,height:28,borderRadius:8,border:'none',background:i===0?'rgba(255,255,255,0.05)':'rgba(255,255,255,0.18)',color:'white',cursor:i===0?'default':'pointer',fontSize:13}}>↑</button>
+                    <button onClick={()=>down(i)} disabled={i===items.length-1||done} style={{width:28,height:28,borderRadius:8,border:'none',background:i===items.length-1?'rgba(255,255,255,0.05)':'rgba(255,255,255,0.18)',color:'white',cursor:i===items.length-1?'default':'pointer',fontSize:13}}>↓</button>
                   </div>
                 </div>
               ))}
             </div>
-
-            <button onClick={confirm} disabled={confirmed} style={{
-              ...styles.btn,
-              background:`linear-gradient(135deg,${color},${color}88)`,
-              color:'white', opacity: confirmed ? 0.6 : 1
-            }}>
-              {confirmed ? '⏳ กำลังบันทึก...' : `✓ ยืนยันการเรียงลำดับ`}
+            <button onClick={confirm} disabled={done} style={{...styles.btn,background:`linear-gradient(135deg,${color},${color}88)`,color:'white',opacity:done?0.6:1}}>
+              {done?'⏳ บันทึกแล้ว...':'✓ ยืนยันลำดับนี้'}
             </button>
           </div>
         );
       };
       return (
         <div style={styles.container}>
-          <div style={{...styles.glowOrb, width:220, height:220, background:color, bottom:-60, left:-60}} />
-          <div style={styles.content}>
-            <Header />
-            <DragSort />
-          </div>
+          <div style={{...styles.glowOrb,width:220,height:220,background:color,bottom:-60,left:-60}}/>
+          <div style={styles.content}><Header/><DragSort/></div>
         </div>
       );
     }
 
-    // fallback
     return null;
   };
 
