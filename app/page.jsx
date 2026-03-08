@@ -1131,6 +1131,18 @@ export default function MhaStoryApp() {
     setCompletedTopics(updatedTopics);
     // Auto-save to Supabase if logged in
     if (user) saveToSupabase(currentTopic.id, score, [...answers]);
+    // Save anonymous lead (contact info only, separate table)
+    if (supabase) {
+      supabase.from('anonymous_leads').insert({
+        owner_name: leadInfo.name,
+        dog_name: leadInfo.dogName,
+        breed: finalBreed,
+        email: leadInfo.email,
+        phone: leadInfo.contact,
+        topic_id: currentTopic.id,
+        source_url: typeof window !== 'undefined' ? window.location.href : ''
+      }).then(() => {}).catch(() => {});
+    }
     setScreen('result');
     setRevealStep(0);
     [1, 2, 3, 4, 5].forEach((step, i) => {
