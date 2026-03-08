@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 // MHA' Story Dog DNA Quiz Platform - Gamification v2
 export default function MhaStoryApp() {
@@ -14,15 +14,25 @@ export default function MhaStoryApp() {
   const [completedTopics, setCompletedTopics] = useState({});
   const [leadStep, setLeadStep] = useState(0);
   const [selectedBreed, setSelectedBreed] = useState('');
+  const [customBreed, setCustomBreed] = useState('');
+  const [showCustomBreedInput, setShowCustomBreedInput] = useState(false);
   const [selectedBadge, setSelectedBadge] = useState(null);
   const [showBadgeModal, setShowBadgeModal] = useState(false);
+
+  // Refs for LINE browser compatibility
+  const dogNameRef = useRef(null);
+  const ownerNameRef = useRef(null);
+  const emailRef = useRef(null);
+  const phoneRef = useRef(null);
+  const customBreedRef = useRef(null);
 
   // Popular dog breeds
   const dogBreeds = [
     'ปอมเมอเรเนียน', 'ชิวาวา', 'พุดเดิ้ล', 'โกลเด้น รีทรีฟเวอร์', 
     'ลาบราดอร์', 'ชิบะ อินุ', 'บีเกิ้ล', 'บูลด็อก', 
     'ไซบีเรียน ฮัสกี้', 'คอร์กี้', 'ชิสุ', 'มอลทีส',
-    'แจ็ค รัสเซล', 'บางแก้ว', 'ไทยหลังอาน', 'พันทาง/มิกซ์'
+    'แจ็ค รัสเซล', 'บางแก้ว', 'ไทยหลังอาน', 'พันทาง/มิกซ์',
+    'อื่นๆ (กรอกเอง)'
   ];
   const [viewingResult, setViewingResult] = useState(null);
 
@@ -565,10 +575,9 @@ export default function MhaStoryApp() {
 
   const isTopicCompleted = (topicId) => !!completedTopics[topicId];
   
+  // TEST MODE: All topics unlocked
   const isTopicUnlocked = (topicId) => {
-    if (topicId === 1) return true;
-    // Check if previous topic is completed
-    return isTopicCompleted(topicId - 1);
+    return true; // All topics accessible for testing
   };
 
   // Styles
@@ -1311,7 +1320,7 @@ export default function MhaStoryApp() {
     const canProceed = () => {
       switch(leadStep) {
         case 0: return leadInfo.dogName.trim().length > 0;
-        case 1: return selectedBreed.length > 0;
+        case 1: return selectedBreed.length > 0 && (selectedBreed !== 'อื่นๆ (กรอกเอง)' || customBreed.trim().length > 0);
         case 2: return leadInfo.name.trim().length > 0;
         case 3: return leadInfo.email && leadInfo.email.trim().length > 0 && leadInfo.email.includes('@');
         default: return false;
@@ -1356,10 +1365,15 @@ export default function MhaStoryApp() {
               <input
                 type="text"
                 placeholder="พิมพ์ชื่อน้องหมา..."
-                value={leadInfo.dogName}
-                onChange={(e) => setLeadInfo({...leadInfo, dogName: e.target.value})}
-                onKeyPress={handleKeyPress}
-                
+                ref={dogNameRef}
+                defaultValue={leadInfo.dogName}
+                onBlur={(e) => setLeadInfo({...leadInfo, dogName: e.target.value})}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    setLeadInfo({...leadInfo, dogName: e.target.value});
+                    if (e.target.value.trim().length > 0) goNextStep();
+                  }
+                }}
                 style={{
                   ...styles.input,
                   fontSize: 18,
@@ -1369,13 +1383,14 @@ export default function MhaStoryApp() {
               />
 
               <button 
-                onClick={goNextStep}
-                disabled={!canProceed()}
+                onClick={() => {
+                  const val = dogNameRef.current?.value || '';
+                  setLeadInfo({...leadInfo, dogName: val});
+                  if (val.trim().length > 0) goNextStep();
+                }}
                 style={{ 
                   ...styles.btn, 
-                  ...styles.btnPrimary,
-                  opacity: canProceed() ? 1 : 0.5,
-                  cursor: canProceed() ? 'pointer' : 'not-allowed'
+                  ...styles.btnPrimary
                 }}
               >
                 ถัดไป →
@@ -1400,15 +1415,20 @@ export default function MhaStoryApp() {
                 display: 'grid', 
                 gridTemplateColumns: 'repeat(2, 1fr)', 
                 gap: 8,
-                maxHeight: 280,
+                maxHeight: selectedBreed === 'อื่นๆ (กรอกเอง)' ? 200 : 280,
                 overflowY: 'auto',
-                marginBottom: 20,
+                marginBottom: 12,
                 padding: 4
               }}>
                 {dogBreeds.map((breed) => (
                   <button
                     key={breed}
-                    onClick={() => setSelectedBreed(breed)}
+                    onClick={() => {
+                      setSelectedBreed(breed);
+                      if (breed !== 'อื่นๆ (กรอกเอง)') {
+                        setCustomBreed('');
+                      }
+                    }}
                     style={{
                       padding: '12px 10px',
                       borderRadius: 12,
@@ -1426,14 +1446,44 @@ export default function MhaStoryApp() {
                 ))}
               </div>
 
+              {/* Custom breed input */}
+              {selectedBreed === 'อื่นๆ (กรอกเอง)' && (
+                <div style={{ marginBottom: 12 }}>
+                  <input
+                    type="text"
+                    placeholder="พิมพ์สายพันธุ์..."
+                    ref={customBreedRef}
+                    defaultValue={customBreed}
+                    onBlur={(e) => setCustomBreed(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        setCustomBreed(e.target.value);
+                        if (e.target.value.trim().length > 0) goNextStep();
+                      }
+                    }}
+                    style={{
+                      ...styles.input,
+                      fontSize: 16,
+                      textAlign: 'center'
+                    }}
+                  />
+                </div>
+              )}
+
               <button 
-                onClick={goNextStep}
-                disabled={!canProceed()}
+                onClick={() => {
+                  if (selectedBreed === 'อื่นๆ (กรอกเอง)') {
+                    const val = customBreedRef.current?.value || '';
+                    setCustomBreed(val);
+                    if (val.trim().length > 0) goNextStep();
+                  } else if (selectedBreed.length > 0) {
+                    goNextStep();
+                  }
+                }}
                 style={{ 
                   ...styles.btn, 
                   ...styles.btnPrimary,
-                  opacity: canProceed() ? 1 : 0.5,
-                  cursor: canProceed() ? 'pointer' : 'not-allowed'
+                  opacity: (selectedBreed.length > 0 && (selectedBreed !== 'อื่นๆ (กรอกเอง)' || customBreed.trim().length > 0)) ? 1 : 0.5
                 }}
               >
                 ถัดไป →
@@ -1450,17 +1500,22 @@ export default function MhaStoryApp() {
                   คุณชื่ออะไร?
                 </h2>
                 <p style={{ fontSize: 13, color: '#888' }}>
-                  พ่อ/แม่ของ {leadInfo.dogName} ({selectedBreed})
+                  พ่อ/แม่ของ {leadInfo.dogName} ({selectedBreed === 'อื่นๆ (กรอกเอง)' ? customBreed : selectedBreed})
                 </p>
               </div>
 
               <input
                 type="text"
                 placeholder="พิมพ์ชื่อคุณ..."
-                value={leadInfo.name}
-                onChange={(e) => setLeadInfo({...leadInfo, name: e.target.value})}
-                onKeyPress={handleKeyPress}
-                
+                ref={ownerNameRef}
+                defaultValue={leadInfo.name}
+                onBlur={(e) => setLeadInfo({...leadInfo, name: e.target.value})}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    setLeadInfo({...leadInfo, name: e.target.value});
+                    if (e.target.value.trim().length > 0) goNextStep();
+                  }
+                }}
                 style={{
                   ...styles.input,
                   fontSize: 18,
@@ -1470,13 +1525,14 @@ export default function MhaStoryApp() {
               />
 
               <button 
-                onClick={goNextStep}
-                disabled={!canProceed()}
+                onClick={() => {
+                  const val = ownerNameRef.current?.value || '';
+                  setLeadInfo({...leadInfo, name: val});
+                  if (val.trim().length > 0) goNextStep();
+                }}
                 style={{ 
                   ...styles.btn, 
-                  ...styles.btnPrimary,
-                  opacity: canProceed() ? 1 : 0.5,
-                  cursor: canProceed() ? 'pointer' : 'not-allowed'
+                  ...styles.btnPrimary
                 }}
               >
                 ถัดไป →
@@ -1505,10 +1561,9 @@ export default function MhaStoryApp() {
                 <input
                   type="email"
                   placeholder="example@email.com"
-                  value={leadInfo.email || ''}
-                  onChange={(e) => setLeadInfo({...leadInfo, email: e.target.value})}
-                  onKeyPress={handleKeyPress}
-                  
+                  ref={emailRef}
+                  defaultValue={leadInfo.email || ''}
+                  onBlur={(e) => setLeadInfo({...leadInfo, email: e.target.value})}
                   style={{
                     ...styles.input,
                     fontSize: 16,
@@ -1525,8 +1580,9 @@ export default function MhaStoryApp() {
                 <input
                   type="tel"
                   placeholder="08X-XXX-XXXX"
-                  value={leadInfo.contact}
-                  onChange={(e) => setLeadInfo({...leadInfo, contact: e.target.value})}
+                  ref={phoneRef}
+                  defaultValue={leadInfo.contact}
+                  onBlur={(e) => setLeadInfo({...leadInfo, contact: e.target.value})}
                   style={{
                     ...styles.input,
                     fontSize: 16,
@@ -1551,19 +1607,24 @@ export default function MhaStoryApp() {
                   🐕 {leadInfo.dogName}
                 </div>
                 <div style={{ fontSize: 12, color: '#888' }}>
-                  {selectedBreed} • เจ้าของ: {leadInfo.name}
+                  {selectedBreed === 'อื่นๆ (กรอกเอง)' ? customBreed : selectedBreed} • เจ้าของ: {leadInfo.name}
                 </div>
               </div>
 
               <button 
-                onClick={goNextStep}
-                disabled={!canProceed()}
+                onClick={() => {
+                  const emailVal = emailRef.current?.value || '';
+                  const phoneVal = phoneRef.current?.value || '';
+                  const finalBreed = selectedBreed === 'อื่นๆ (กรอกเอง)' ? customBreed : selectedBreed;
+                  setLeadInfo({...leadInfo, email: emailVal, contact: phoneVal, breed: finalBreed});
+                  if (emailVal.includes('@')) {
+                    submitLead();
+                  }
+                }}
                 style={{ 
                   ...styles.btn, 
                   ...styles.btnPrimary,
-                  fontSize: 18,
-                  opacity: canProceed() ? 1 : 0.5,
-                  cursor: canProceed() ? 'pointer' : 'not-allowed'
+                  fontSize: 18
                 }}
               >
                 🧬 ดูผล DNA บุคลิกภาพ!
