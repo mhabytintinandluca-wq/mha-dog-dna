@@ -1533,8 +1533,17 @@ export default function MhaStoryApp() {
           onClick={e => e.stopPropagation()}
           style={{ background:'#1a1a2e', borderRadius:'24px 24px 0 0', padding:24, width:'100%', maxWidth:480, paddingBottom:36 }}
         >
-          {/* Handle bar */}
-          <div style={{ width:40, height:4, background:'rgba(255,255,255,0.2)', borderRadius:2, margin:'0 auto 20px' }}/>
+          {/* Handle bar + close */}
+          <div style={{ position:'relative', marginBottom:16 }}>
+            <div style={{ width:40, height:4, background:'rgba(255,255,255,0.2)', borderRadius:2, margin:'0 auto' }}/>
+            <button onClick={() => setSharePopup(null)} style={{ position:'absolute', right:0, top:-10, width:32, height:32, borderRadius:'50%', background:'rgba(255,255,255,0.12)', border:'none', color:'white', fontSize:16, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'inherit' }}>✕</button>
+          </div>
+
+          {/* Header text */}
+          <div style={{ textAlign:'center', marginBottom:16 }}>
+            <div style={{ fontSize:18, fontWeight:800, color:'white', marginBottom:4 }}>มาแชร์ให้เพื่อนๆ กันเถอะ! 🐾</div>
+            <div style={{ fontSize:13, color:'rgba(255,255,255,0.5)' }}>ให้เพื่อนมาทำ Test นี้ด้วยกัน</div>
+          </div>
 
           {/* Test info */}
           <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:20 }}>
