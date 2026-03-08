@@ -1167,6 +1167,23 @@ export default function MhaStoryApp() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // ── URL deep-link: ?topic=X → jump straight to that test ─────────────
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const topicId = parseInt(params.get('topic'));
+      if (topicId >= 1 && topicId <= 12) {
+        const found = allTopics.find(t => t.id === topicId);
+        if (found) {
+          setCurrentTopic(found);
+          setAnswers([]);
+          setCurrentQuestion(0);
+          setScreen('topic-intro');
+        }
+      }
+    } catch(e) {}
+  }, []);
+
   const loadProfileFromSupabase = async (userId) => {
     if (!supabase) return;
     try {
@@ -1491,6 +1508,75 @@ export default function MhaStoryApp() {
   );
 
   // Overview Screen - Show all 12 DNA Tests
+  // ─── Share Popup ─────────────────────────────────────────────────────────
+  const [sharePopup, setSharePopup] = useState(null); // topic object or null
+
+  const SharePopup = () => {
+    if (!sharePopup) return null;
+    const base = typeof window !== 'undefined' ? window.location.origin + window.location.pathname : '';
+    const link = `${base}?topic=${sharePopup.id}`;
+    const msg = `🐾 มาทำ Dog DNA Test "${sharePopup.name}" ด้วยกัน!\nรู้จัก${sharePopup.shortDesc}\n${link}`;
+    const [copied, setCopied] = useState(false);
+
+    const copyLink = async () => {
+      try { await navigator.clipboard.writeText(link); } catch(e) {}
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    };
+
+    return (
+      <div
+        onClick={() => setSharePopup(null)}
+        style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.7)', zIndex:1000, display:'flex', alignItems:'flex-end', justifyContent:'center' }}
+      >
+        <div
+          onClick={e => e.stopPropagation()}
+          style={{ background:'#1a1a2e', borderRadius:'24px 24px 0 0', padding:24, width:'100%', maxWidth:480, paddingBottom:36 }}
+        >
+          {/* Handle bar */}
+          <div style={{ width:40, height:4, background:'rgba(255,255,255,0.2)', borderRadius:2, margin:'0 auto 20px' }}/>
+
+          {/* Test info */}
+          <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:20 }}>
+            <div style={{ width:48, height:48, borderRadius:14, background:`${sharePopup.color}22`, border:`2px solid ${sharePopup.color}`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:24 }}>
+              {sharePopup.emoji}
+            </div>
+            <div>
+              <div style={{ fontSize:15, fontWeight:700, color:'white' }}>{sharePopup.name}</div>
+              <div style={{ fontSize:12, color:'rgba(255,255,255,0.5)' }}>{sharePopup.shortDesc}</div>
+            </div>
+          </div>
+
+          {/* Link preview */}
+          <div style={{ background:'rgba(255,255,255,0.06)', borderRadius:12, padding:'10px 14px', marginBottom:16, display:'flex', alignItems:'center', gap:10 }}>
+            <span style={{ fontSize:12, color:'rgba(255,255,255,0.4)', flex:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{link}</span>
+            <button onClick={copyLink} style={{ flexShrink:0, padding:'6px 14px', borderRadius:8, border:'none', background: copied ? '#2ECC71' : sharePopup.color, color:'white', fontSize:12, fontWeight:700, cursor:'pointer' }}>
+              {copied ? '✓ Copied!' : '📋 Copy'}
+            </button>
+          </div>
+
+          {/* Share buttons */}
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+            <a
+              href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}&quote=${encodeURIComponent(`🐾 ${sharePopup.name} — Dog DNA Test`)}`}
+              target="_blank" rel="noopener noreferrer"
+              style={{ padding:'14px', borderRadius:14, background:'#1877F2', color:'white', fontSize:14, fontWeight:700, textAlign:'center', textDecoration:'none', display:'block' }}
+            >
+              📘 Facebook
+            </a>
+            <a
+              href={`https://line.me/R/msg/text/?${encodeURIComponent(msg)}`}
+              target="_blank" rel="noopener noreferrer"
+              style={{ padding:'14px', borderRadius:14, background:'#06C755', color:'white', fontSize:14, fontWeight:700, textAlign:'center', textDecoration:'none', display:'block' }}
+            >
+              💚 LINE
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const OverviewScreen = () => {
     const dimensions = [
       { name: 'BOND', emoji: '💛', color: '#FFD93D', desc: 'ความผูกพัน' },
@@ -1663,6 +1749,21 @@ export default function MhaStoryApp() {
                           boxShadow: isCompleted ? `0 4px 20px ${topic.color}44` : 'none'
                         }}
                       >
+                        {/* Share Button */}
+                        <button
+                          onClick={e => { e.stopPropagation(); setSharePopup(topic); }}
+                          style={{
+                            position:'absolute', top:6, left:6,
+                            width:24, height:24, borderRadius:8,
+                            background:'rgba(255,255,255,0.15)',
+                            border:'none', cursor:'pointer',
+                            display:'flex', alignItems:'center', justifyContent:'center',
+                            fontSize:11, color:'white', transition:'all 0.2s'
+                          }}
+                          onMouseOver={e => e.currentTarget.style.background='rgba(255,255,255,0.3)'}
+                          onMouseOut={e => e.currentTarget.style.background='rgba(255,255,255,0.15)'}
+                        >📤</button>
+
                         {/* Badge Icon */}
                         <div style={{
                           fontSize: 32,
@@ -2644,6 +2745,45 @@ export default function MhaStoryApp() {
     );
   };
 
+  // ── ShareTestButton — copy ?topic=X link ──────────────────────────────────
+  const ShareTestButton = ({ topicId, topicName }) => {
+    const [copied, setCopied] = React.useState(false);
+    const getLink = () => {
+      const base = window.location.origin + window.location.pathname;
+      return `${base}?topic=${topicId}`;
+    };
+    const handleShare = async () => {
+      const link = getLink();
+      const text = `🐾 ลองทำ "${topicName}" Test ดูว่าน้องหมาคุณเป็นยังไง!
+${link}`;
+      if (navigator.share) {
+        try { await navigator.share({ title: `Mha' Story — ${topicName}`, text, url: link }); return; } catch(e) {}
+      }
+      try {
+        await navigator.clipboard.writeText(link);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2500);
+      } catch(e) {}
+    };
+    return (
+      <div style={{ display:'flex', gap:10 }}>
+        <button onClick={handleShare} style={{
+          flex:1, padding:'13px 16px', borderRadius:14, border:'none', cursor:'pointer',
+          background: copied ? 'linear-gradient(135deg,#2ECC71,#27AE60)' : 'linear-gradient(135deg,#FF6B6B,#FFD700)',
+          color:'white', fontSize:14, fontWeight:700, fontFamily:'inherit', transition:'all 0.3s'
+        }}>
+          {copied ? '✅ คัดลอกแล้ว!' : '📋 Copy Link แชร์เพื่อน'}
+        </button>
+        <button onClick={() => { const l=getLink(); window.open(`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(l)}`,'_blank'); }} style={{
+          width:48, height:48, borderRadius:14, border:'none', cursor:'pointer',
+          background:'#06C755', color:'white', fontSize:20, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0
+        }}>
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="white"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63h2.386c.349 0 .63.285.63.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63.349 0 .631.285.631.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+        </button>
+      </div>
+    );
+  };
+
   // Result Screen
   const ResultScreen = () => {
     const topicToShow = viewingResult || currentTopic;
@@ -2659,11 +2799,16 @@ export default function MhaStoryApp() {
           {/* Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
             <button onClick={() => { setViewingResult(null); setScreen('dashboard'); }} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: 'white' }}>←</button>
-            <button style={{
+            <button onClick={async () => {
+                const base = window.location.origin + window.location.pathname;
+                const link = `${base}?topic=${topicToShow.id}`;
+                try { await navigator.clipboard.writeText(link); } catch(e) {}
+                if (navigator.share) navigator.share({ title: `Mha' Story — ${topicToShow.name}`, url: link });
+              }} style={{
               background: 'linear-gradient(135deg, #FF6B6B, #FF8E53)',
               color: 'white', border: 'none', padding: '10px 20px', borderRadius: 20,
               fontSize: 14, fontWeight: 600, cursor: 'pointer'
-            }}>📤 แชร์ผล</button>
+            }}>📤 แชร์ Test นี้</button>
           </div>
 
           {/* Topic Badge */}
@@ -2837,10 +2982,16 @@ export default function MhaStoryApp() {
               </button>
             </div>
 
-            {/* Share Button */}
-            <button style={{ ...styles.btn, ...styles.btnGhost, marginBottom: 24 }}>
-              📤 แชร์ผลให้เพื่อน
-            </button>
+            {/* Share Test Link */}
+            <div style={{ ...styles.darkCard, marginBottom: 16, background:'linear-gradient(135deg,rgba(255,107,107,0.1),rgba(255,215,0,0.08))', border:'1px solid rgba(255,215,0,0.25)' }}>
+              <div style={{ fontSize:13, fontWeight:700, color:'#FFD700', marginBottom:8 }}>
+                🔗 แชร์ Test นี้ให้เพื่อน
+              </div>
+              <div style={{ fontSize:12, color:'rgba(255,255,255,0.55)', marginBottom:14, lineHeight:1.6 }}>
+                ส่ง link นี้ให้เพื่อน — กดแล้วเริ่ม Test {topicToShow.name} ได้เลย!
+              </div>
+              <ShareTestButton topicId={topicToShow.id} topicName={topicToShow.name} />
+            </div>
           </div>
         </div>
       </div>
@@ -3286,6 +3437,7 @@ export default function MhaStoryApp() {
       {showLeadGate && <LeadGateModal />}
       {showBadgeModal && selectedBadge && <BadgePreviewModal />}
       {showDimensionPopup && <DimensionPopup />}
+      {sharePopup && <SharePopup />}
     </>
   );
 }
