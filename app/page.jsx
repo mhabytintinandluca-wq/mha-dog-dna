@@ -1953,31 +1953,535 @@ export default function MhaStoryApp() {
     }
   };
 
+  // ─── Mechanic map: which UI each topic uses ───────────────────────────────
+  // 1=scene_selector, 2=match_pairs, 3=story_frequency, 4=reconstruct,
+  // 5=archetype_pick, 6=what_would_dog_do, 7=timeline_picker,
+  // 8=signal_decoder, 9=trigger_reaction, 10=home_alone_story,
+  // 11=social_role, 12=instinct_map
+  const MECHANIC_MAP = {
+    1: 'scene_selector', 2: 'match_pairs', 3: 'story_frequency',
+    4: 'reconstruct',    5: 'archetype_pick', 6: 'what_would_dog_do',
+    7: 'timeline_picker',8: 'signal_decoder',  9: 'trigger_reaction',
+    10:'home_alone',    11:'social_role',      12:'instinct_map'
+  };
+
   const QuizScreen = () => {
     const q = quizQuestions[currentQuestion];
-    const optionColors = [
-      'linear-gradient(135deg, #4ECDC4, #44A89A)',
-      'linear-gradient(135deg, #6C63FF, #5A52D5)',
-      'linear-gradient(135deg, #FF6B6B, #E55555)',
-      'linear-gradient(135deg, #FFD93D, #E5C235)',
-    ];
+    const mechanic = MECHANIC_MAP[currentTopic.id] || 'scene_selector';
+    const color = currentTopic.color;
+    const dogName = leadInfo.dogName || 'น้องหมา';
+
+    // ── shared header & progress ──────────────────────────────────────────
+    const Header = () => (
+      <>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
+          <button onClick={() => setScreen('topic-intro')} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: 'white' }}>←</button>
+          <div style={{ flex: 1, textAlign: 'center' }}>
+            <span style={{ fontSize: 20 }}>{currentTopic.emoji}</span>
+            <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', marginLeft: 8 }}>{currentTopic.name}</span>
+          </div>
+          <span style={{ background: color, color: 'white', padding: '6px 14px', borderRadius: 20, fontSize: 14, fontWeight: 700 }}>
+            {currentQuestion + 1}/10
+          </span>
+        </div>
+        <div style={{ height: 6, background: 'rgba(255,255,255,0.1)', borderRadius: 3, marginBottom: 20, overflow: 'hidden' }}>
+          <div style={{ width: `${((currentQuestion + 1) / 10) * 100}%`, height: '100%', background: `linear-gradient(90deg, ${color}, #FFD93D)`, borderRadius: 3, transition: 'width 0.5s ease' }} />
+        </div>
+      </>
+    );
+
+    // ── MECHANIC 1: SCENE SELECTOR (Test 1 — Stare Code) ─────────────────
+    // "เลือก 1 สถานการณ์ที่น้องสบตาคุณนานที่สุด"
+    if (mechanic === 'scene_selector') {
+      const sceneEmojis = ['🍽️','😢','🚪','🛋️','📱','🌙','👋','🧘'];
+      return (
+        <div style={styles.container}>
+          <div style={{...styles.glowOrb, width: 250, height: 250, background: color, top: -60, right: -80}} />
+          <div style={styles.content}>
+            <Header />
+            <div style={{ ...styles.darkCard, marginBottom: 16, textAlign: 'center' }}>
+              <div style={{ fontSize: 11, letterSpacing: 2, color: color, fontWeight: 700, marginBottom: 8 }}>👁️ SCENE SELECTOR</div>
+              <h2 style={{ fontSize: 18, fontWeight: 700, color: 'white', lineHeight: 1.5 }}>{q.q}</h2>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {q.options.map((opt, i) => (
+                <button key={opt.id} onClick={() => handleAnswer(opt.score)} style={{
+                  padding: '16px 12px', borderRadius: 18, border: `2px solid ${color}44`,
+                  background: 'rgba(255,255,255,0.06)', color: 'white',
+                  fontSize: 14, fontWeight: 600, textAlign: 'center', lineHeight: 1.5,
+                  cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8
+                }}
+                onMouseOver={e => { e.currentTarget.style.background=`${color}22`; e.currentTarget.style.borderColor=color; }}
+                onMouseOut={e => { e.currentTarget.style.background='rgba(255,255,255,0.06)'; e.currentTarget.style.borderColor=`${color}44`; }}
+                >
+                  <span style={{ fontSize: 28 }}>{sceneEmojis[i % sceneEmojis.length]}</span>
+                  <span>{opt.text}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── MECHANIC 2: MATCH PAIRS (Test 2 — Empathy DNA) ───────────────────
+    // "คุณรู้สึก X → น้องทำอะไร? เลือกปฏิกิริยาที่ตรงที่สุด"
+    if (mechanic === 'match_pairs') {
+      const reactionEmojis = ['🐾','🐽','👀','🛌'];
+      return (
+        <div style={styles.container}>
+          <div style={{...styles.glowOrb, width: 250, height: 250, background: color, bottom: -60, left: -80}} />
+          <div style={styles.content}>
+            <Header />
+            <div style={{ ...styles.darkCard, marginBottom: 12, background: `${color}18`, border: `1px solid ${color}44` }}>
+              <div style={{ fontSize: 11, letterSpacing: 2, color: color, fontWeight: 700, marginBottom: 6 }}>💞 EMPATHY MAP</div>
+              <h2 style={{ fontSize: 18, fontWeight: 700, color: 'white', lineHeight: 1.5 }}>{q.q}</h2>
+            </div>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', textAlign: 'center', marginBottom: 12 }}>
+              👇 {dogName} ตอบสนองแบบไหนมากที่สุด?
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {q.options.map((opt, i) => (
+                <button key={opt.id} onClick={() => handleAnswer(opt.score)} style={{
+                  padding: '14px 18px', borderRadius: 16,
+                  border: `1.5px solid rgba(255,255,255,0.12)`,
+                  background: 'rgba(255,255,255,0.05)', color: 'white',
+                  fontSize: 15, fontWeight: 500, textAlign: 'left', lineHeight: 1.5,
+                  cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s',
+                  display: 'flex', alignItems: 'center', gap: 14
+                }}
+                onMouseOver={e => { e.currentTarget.style.background=`${color}22`; e.currentTarget.style.borderColor=color; }}
+                onMouseOut={e => { e.currentTarget.style.background='rgba(255,255,255,0.05)'; e.currentTarget.style.borderColor='rgba(255,255,255,0.12)'; }}
+                >
+                  <span style={{ fontSize: 24, flexShrink: 0 }}>{reactionEmojis[i]}</span>
+                  <span>{opt.text}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── MECHANIC 3: STORY FREQUENCY (Test 3 — 6th Sense) ─────────────────
+    // "อ่าน micro-story → เลือกความถี่ที่เกิดขึ้นกับน้อง"
+    if (mechanic === 'story_frequency') {
+      const freqLabels = ['ไม่เคย','นานๆครั้ง','บางครั้ง','บ่อยมาก'];
+      const freqColors = ['#666','#FF8E53','#4ECDC4','#FFD700'];
+      const freqEmojis = ['😶','🤔','😮','🤩'];
+      return (
+        <div style={styles.container}>
+          <div style={{...styles.glowOrb, width: 200, height: 200, background: color, top: 80, right: -60}} />
+          <div style={styles.content}>
+            <Header />
+            <div style={{ ...styles.darkCard, marginBottom: 20, background: 'rgba(255,255,255,0.04)' }}>
+              <div style={{ fontSize: 11, letterSpacing: 2, color: color, fontWeight: 700, marginBottom: 10 }}>🔮 SIXTH SENSE CHECK</div>
+              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 12, fontStyle: 'italic' }}>สถานการณ์นี้เกิดขึ้นกับ{dogName}บ้างไหม?</div>
+              <h2 style={{ fontSize: 17, fontWeight: 700, color: 'white', lineHeight: 1.6 }}>{q.q}</h2>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {q.options.map((opt, i) => (
+                <button key={opt.id} onClick={() => handleAnswer(opt.score)} style={{
+                  padding: '18px 12px', borderRadius: 18,
+                  border: `2px solid ${freqColors[i]}44`,
+                  background: `${freqColors[i]}15`,
+                  color: 'white', textAlign: 'center',
+                  cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s'
+                }}
+                onMouseOver={e => { e.currentTarget.style.background=`${freqColors[i]}30`; e.currentTarget.style.borderColor=freqColors[i]; }}
+                onMouseOut={e => { e.currentTarget.style.background=`${freqColors[i]}15`; e.currentTarget.style.borderColor=`${freqColors[i]}44`; }}
+                >
+                  <div style={{ fontSize: 28, marginBottom: 6 }}>{freqEmojis[i]}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: freqColors[i], marginBottom: 4 }}>{freqLabels[i]}</div>
+                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', lineHeight: 1.4 }}>{opt.text}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── MECHANIC 4: RECONSTRUCT (Test 4 — Food Blueprint) ────────────────
+    // "เล่าเรื่องน้องทีละ frame — reconstruct the moment"
+    if (mechanic === 'reconstruct') {
+      const frameNum = currentQuestion + 1;
+      const frameLabels = ['Frame 1','Frame 2','Frame 3','Frame 4','Frame 5','Frame 6','Frame 7','Frame 8','Frame 9','Frame 10'];
+      return (
+        <div style={styles.container}>
+          <div style={{...styles.glowOrb, width: 220, height: 220, background: color, top: 60, left: -70}} />
+          <div style={styles.content}>
+            <Header />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+              <div style={{ padding: '4px 12px', background: `${color}33`, border: `1px solid ${color}`, borderRadius: 20, fontSize: 11, fontWeight: 700, color: color }}>
+                🎬 {frameLabels[currentQuestion]}
+              </div>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>Reconstruct the Moment</div>
+            </div>
+            <div style={{ ...styles.darkCard, marginBottom: 16, borderLeft: `4px solid ${color}` }}>
+              <h2 style={{ fontSize: 18, fontWeight: 700, color: 'white', lineHeight: 1.6 }}>{q.q}</h2>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {q.options.map((opt, i) => {
+                const icons = ['🏃','🐢','👀','💤'];
+                return (
+                  <button key={opt.id} onClick={() => handleAnswer(opt.score)} style={{
+                    padding: '15px 18px', borderRadius: 16,
+                    border: `1.5px solid rgba(255,255,255,0.1)`,
+                    background: 'rgba(255,255,255,0.05)', color: 'white',
+                    fontSize: 15, fontWeight: 500, textAlign: 'left',
+                    cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s',
+                    display: 'flex', alignItems: 'center', gap: 12
+                  }}
+                  onMouseOver={e => { e.currentTarget.style.background=`${color}20`; e.currentTarget.style.borderColor=`${color}88`; }}
+                  onMouseOut={e => { e.currentTarget.style.background='rgba(255,255,255,0.05)'; e.currentTarget.style.borderColor='rgba(255,255,255,0.1)'; }}
+                  >
+                    <span style={{ fontSize: 22, flexShrink: 0 }}>{icons[i % 4]}</span>
+                    <span style={{ lineHeight: 1.4 }}>{opt.text}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── MECHANIC 5: ARCHETYPE PICK (Test 5 — Play Personality) ───────────
+    // "เลือก play personality card ที่ตรงกับน้อง"
+    if (mechanic === 'archetype_pick') {
+      const archetypeEmojis = ['🦁','🐬','🦊','🐨'];
+      const archetypeColors = ['#FF6B6B','#4ECDC4','#FFD93D','#9B59B6'];
+      return (
+        <div style={styles.container}>
+          <div style={{...styles.glowOrb, width: 250, height: 250, background: color, bottom: -80, right: -60}} />
+          <div style={styles.content}>
+            <Header />
+            <div style={{ ...styles.darkCard, textAlign: 'center', marginBottom: 16, background: `${color}18` }}>
+              <div style={{ fontSize: 11, letterSpacing: 2, color: color, fontWeight: 700, marginBottom: 8 }}>🎾 PLAY ARCHETYPE</div>
+              <h2 style={{ fontSize: 18, fontWeight: 700, color: 'white', lineHeight: 1.5 }}>{q.q}</h2>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+              {q.options.map((opt, i) => (
+                <button key={opt.id} onClick={() => handleAnswer(opt.score)} style={{
+                  padding: '20px 12px', borderRadius: 20,
+                  border: `2px solid ${archetypeColors[i]}55`,
+                  background: `${archetypeColors[i]}18`,
+                  color: 'white', textAlign: 'center',
+                  cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.25s'
+                }}
+                onMouseOver={e => { e.currentTarget.style.background=`${archetypeColors[i]}35`; e.currentTarget.style.borderColor=archetypeColors[i]; e.currentTarget.style.transform='scale(1.04)'; }}
+                onMouseOut={e => { e.currentTarget.style.background=`${archetypeColors[i]}18`; e.currentTarget.style.borderColor=`${archetypeColors[i]}55`; e.currentTarget.style.transform='scale(1)'; }}
+                >
+                  <div style={{ fontSize: 36, marginBottom: 10 }}>{archetypeEmojis[i]}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: archetypeColors[i], marginBottom: 6 }}>
+                    {opt.text.split('—')[0] || opt.text}
+                  </div>
+                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', lineHeight: 1.4 }}>
+                    {opt.text.split('—')[1] || ''}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── MECHANIC 6: WHAT WOULD DOG DO (Test 6 — IQ Signal) ───────────────
+    // "น้องอยู่ใน scenario นี้ — น้องจะทำอะไร?"
+    if (mechanic === 'what_would_dog_do') {
+      return (
+        <div style={styles.container}>
+          <div style={{...styles.glowOrb, width: 200, height: 200, background: color, top: 100, right: -60}} />
+          <div style={styles.content}>
+            <Header />
+            <div style={{ ...styles.darkCard, marginBottom: 8, background: 'rgba(78,205,196,0.08)', border: '1px solid rgba(78,205,196,0.2)' }}>
+              <div style={{ fontSize: 11, letterSpacing: 2, color: '#4ECDC4', fontWeight: 700, marginBottom: 8 }}>🧠 IQ SIGNAL TEST</div>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginBottom: 10 }}>Scenario: {dogName} เจอสถานการณ์นี้...</div>
+              <h2 style={{ fontSize: 18, fontWeight: 700, color: 'white', lineHeight: 1.6 }}>{q.q}</h2>
+            </div>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', textAlign: 'center', marginBottom: 14 }}>
+              น้องจะทำอะไร? 👇
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {q.options.map((opt, i) => {
+                const labels = ['A','B','C','D'];
+                return (
+                  <button key={opt.id} onClick={() => handleAnswer(opt.score)} style={{
+                    padding: '14px 18px', borderRadius: 16,
+                    border: '1.5px solid rgba(78,205,196,0.2)',
+                    background: 'rgba(78,205,196,0.06)', color: 'white',
+                    fontSize: 14, textAlign: 'left', lineHeight: 1.5,
+                    cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s',
+                    display: 'flex', alignItems: 'flex-start', gap: 12
+                  }}
+                  onMouseOver={e => { e.currentTarget.style.background='rgba(78,205,196,0.18)'; e.currentTarget.style.borderColor='#4ECDC4'; }}
+                  onMouseOut={e => { e.currentTarget.style.background='rgba(78,205,196,0.06)'; e.currentTarget.style.borderColor='rgba(78,205,196,0.2)'; }}
+                  >
+                    <span style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(78,205,196,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, color: '#4ECDC4', flexShrink: 0 }}>{labels[i]}</span>
+                    <span style={{ lineHeight: 1.5 }}>{opt.text}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── MECHANIC 7: TIMELINE PICKER (Test 7 — Mind Reader) ───────────────
+    // "น้องรู้เรื่องนี้เมื่อไหร่? เลือกจาก timeline"
+    if (mechanic === 'timeline_picker') {
+      const timelineSteps = ['ก่อนเลย','พร้อมกัน','หลังนิดนึง','ไม่รู้เลย'];
+      const timelineIcons = ['⚡','🔄','🐢','❓'];
+      return (
+        <div style={styles.container}>
+          <div style={{...styles.glowOrb, width: 220, height: 220, background: color, top: -60, left: '50%', transform: 'translateX(-50%)'}} />
+          <div style={styles.content}>
+            <Header />
+            <div style={{ ...styles.darkCard, marginBottom: 16, background: 'rgba(155,89,182,0.08)', border: '1px solid rgba(155,89,182,0.25)' }}>
+              <div style={{ fontSize: 11, letterSpacing: 2, color: '#9B59B6', fontWeight: 700, marginBottom: 8 }}>🔮 TIMING TEST</div>
+              <h2 style={{ fontSize: 18, fontWeight: 700, color: 'white', lineHeight: 1.6 }}>{q.q}</h2>
+            </div>
+            {/* Visual timeline bar */}
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 20, padding: '0 8px' }}>
+              {timelineSteps.map((step, i) => (
+                <React.Fragment key={i}>
+                  <div style={{ textAlign: 'center', fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>
+                    <div style={{ fontSize: 16, marginBottom: 4 }}>{timelineIcons[i]}</div>
+                    {step}
+                  </div>
+                  {i < 3 && <div style={{ flex: 1, height: 2, background: 'rgba(255,255,255,0.1)', margin: '0 4px' }} />}
+                </React.Fragment>
+              ))}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {q.options.map((opt, i) => (
+                <button key={opt.id} onClick={() => handleAnswer(opt.score)} style={{
+                  padding: '14px 18px', borderRadius: 16,
+                  border: `1.5px solid rgba(155,89,182,0.2)`,
+                  background: 'rgba(155,89,182,0.06)', color: 'white',
+                  fontSize: 14, textAlign: 'left', lineHeight: 1.5,
+                  cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s',
+                  display: 'flex', alignItems: 'center', gap: 12
+                }}
+                onMouseOver={e => { e.currentTarget.style.background='rgba(155,89,182,0.2)'; e.currentTarget.style.borderColor='#9B59B6'; }}
+                onMouseOut={e => { e.currentTarget.style.background='rgba(155,89,182,0.06)'; e.currentTarget.style.borderColor='rgba(155,89,182,0.2)'; }}
+                >
+                  <span style={{ fontSize: 20, flexShrink: 0 }}>{timelineIcons[i]}</span>
+                  <span>{opt.text}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── MECHANIC 8: SIGNAL DECODER (Test 8 — Secret Language) ────────────
+    // "เห็น situation → decode สัญญาณที่น้องส่งออกมา"
+    if (mechanic === 'signal_decoder') {
+      const signalIcons = ['🔊','🐾','👁️','🤐'];
+      return (
+        <div style={styles.container}>
+          <div style={{...styles.glowOrb, width: 200, height: 200, background: '#3498DB', top: 80, right: -60}} />
+          <div style={styles.content}>
+            <Header />
+            <div style={{ ...styles.darkCard, marginBottom: 12, background: 'rgba(52,152,219,0.08)', border: '1px solid rgba(52,152,219,0.25)' }}>
+              <div style={{ fontSize: 11, letterSpacing: 2, color: '#3498DB', fontWeight: 700, marginBottom: 8 }}>📡 SIGNAL DECODER</div>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginBottom: 10 }}>Situation: {q.q.split('→')[0]}</div>
+              <h2 style={{ fontSize: 17, fontWeight: 700, color: 'white', lineHeight: 1.6 }}>
+                {q.q.split('→')[1] || q.q}
+              </h2>
+            </div>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', textAlign: 'center', marginBottom: 12 }}>
+              📡 {dogName} ส่งสัญญาณแบบไหน?
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {q.options.map((opt, i) => (
+                <button key={opt.id} onClick={() => handleAnswer(opt.score)} style={{
+                  padding: '16px 12px', borderRadius: 18,
+                  border: '1.5px solid rgba(52,152,219,0.25)',
+                  background: 'rgba(52,152,219,0.08)', color: 'white',
+                  textAlign: 'center', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s'
+                }}
+                onMouseOver={e => { e.currentTarget.style.background='rgba(52,152,219,0.22)'; e.currentTarget.style.borderColor='#3498DB'; }}
+                onMouseOut={e => { e.currentTarget.style.background='rgba(52,152,219,0.08)'; e.currentTarget.style.borderColor='rgba(52,152,219,0.25)'; }}
+                >
+                  <div style={{ fontSize: 26, marginBottom: 8 }}>{signalIcons[i]}</div>
+                  <div style={{ fontSize: 12, lineHeight: 1.4 }}>{opt.text}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── MECHANIC 9: TRIGGER + REACTION (Test 9 — Nerve Map) ──────────────
+    // "เลือก trigger → เลือก reaction ของน้อง"
+    if (mechanic === 'trigger_reaction') {
+      return (
+        <div style={styles.container}>
+          <div style={{...styles.glowOrb, width: 220, height: 220, background: '#E74C3C', top: -50, left: -60}} />
+          <div style={styles.content}>
+            <Header />
+            <div style={{ ...styles.darkCard, marginBottom: 12, background: 'rgba(231,76,60,0.08)', border: '1px solid rgba(231,76,60,0.25)' }}>
+              <div style={{ fontSize: 11, letterSpacing: 2, color: '#E74C3C', fontWeight: 700, marginBottom: 8 }}>⚡ NERVE MAP</div>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginBottom: 8 }}>Trigger situation:</div>
+              <h2 style={{ fontSize: 17, fontWeight: 700, color: 'white', lineHeight: 1.6 }}>{q.q}</h2>
+            </div>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', textAlign: 'center', marginBottom: 14 }}>
+              น้องตอบสนองอย่างไร? 👇
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {q.options.map((opt, i) => {
+                const reactionColors = ['#E74C3C','#E67E22','#F39C12','#2ECC71'];
+                const reactionLabels = ['รุนแรง','ปานกลาง','เล็กน้อย','ไม่แสดงออก'];
+                return (
+                  <button key={opt.id} onClick={() => handleAnswer(opt.score)} style={{
+                    padding: '14px 18px', borderRadius: 16,
+                    border: `1.5px solid ${reactionColors[i]}33`,
+                    background: `${reactionColors[i]}10`, color: 'white',
+                    fontSize: 14, textAlign: 'left', lineHeight: 1.5,
+                    cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s',
+                    display: 'flex', alignItems: 'center', gap: 12
+                  }}
+                  onMouseOver={e => { e.currentTarget.style.background=`${reactionColors[i]}25`; e.currentTarget.style.borderColor=reactionColors[i]; }}
+                  onMouseOut={e => { e.currentTarget.style.background=`${reactionColors[i]}10`; e.currentTarget.style.borderColor=`${reactionColors[i]}33`; }}
+                  >
+                    <div style={{ flexShrink: 0, textAlign: 'center' }}>
+                      <div style={{ fontSize: 10, color: reactionColors[i], fontWeight: 700 }}>{reactionLabels[i]}</div>
+                    </div>
+                    <span>{opt.text}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── MECHANIC 10: HOME ALONE STORY (Test 10 — Alone Index) ────────────
+    // "เลือก scene ที่เกิดขึ้นจริงตอนน้องอยู่บ้านคนเดียว"
+    if (mechanic === 'home_alone') {
+      const homeScenes = ['🏠','📹','🧸','🚪'];
+      return (
+        <div style={styles.container}>
+          <div style={{...styles.glowOrb, width: 200, height: 200, background: '#E67E22', bottom: -60, right: -60}} />
+          <div style={styles.content}>
+            <Header />
+            <div style={{ ...styles.darkCard, marginBottom: 12, background: 'rgba(230,126,34,0.08)', border: '1px solid rgba(230,126,34,0.25)' }}>
+              <div style={{ fontSize: 11, letterSpacing: 2, color: '#E67E22', fontWeight: 700, marginBottom: 8 }}>🏠 HOME ALONE STORY</div>
+              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 10, fontStyle: 'italic' }}>
+                ลองนึกภาพตอนที่ {dogName} อยู่บ้านคนเดียว...
+              </div>
+              <h2 style={{ fontSize: 17, fontWeight: 700, color: 'white', lineHeight: 1.6 }}>{q.q}</h2>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {q.options.map((opt, i) => (
+                <button key={opt.id} onClick={() => handleAnswer(opt.score)} style={{
+                  padding: '16px 12px', borderRadius: 18,
+                  border: `2px solid rgba(230,126,34,0.2)`,
+                  background: 'rgba(230,126,34,0.08)', color: 'white',
+                  textAlign: 'center', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s'
+                }}
+                onMouseOver={e => { e.currentTarget.style.background='rgba(230,126,34,0.22)'; e.currentTarget.style.borderColor='#E67E22'; }}
+                onMouseOut={e => { e.currentTarget.style.background='rgba(230,126,34,0.08)'; e.currentTarget.style.borderColor='rgba(230,126,34,0.2)'; }}
+                >
+                  <div style={{ fontSize: 28, marginBottom: 8 }}>{homeScenes[i]}</div>
+                  <div style={{ fontSize: 12, lineHeight: 1.4 }}>{opt.text}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── MECHANIC 11: SOCIAL ROLE (Test 11 — Pack Code) ───────────────────
+    // "น้องอยู่ในกลุ่ม — น้องเป็น role อะไร?"
+    if (mechanic === 'social_role') {
+      const roles = ['👑','🛡️','🎭','🌿'];
+      const roleNames = ['Leader','Protector','Joker','Observer'];
+      const roleColors = ['#FFD700','#4ECDC4','#FF6B6B','#2ECC71'];
+      return (
+        <div style={styles.container}>
+          <div style={{...styles.glowOrb, width: 250, height: 250, background: '#2ECC71', top: -60, right: -80}} />
+          <div style={styles.content}>
+            <Header />
+            <div style={{ ...styles.darkCard, marginBottom: 12, background: 'rgba(46,204,113,0.08)', border: '1px solid rgba(46,204,113,0.25)' }}>
+              <div style={{ fontSize: 11, letterSpacing: 2, color: '#2ECC71', fontWeight: 700, marginBottom: 8 }}>🐺 PACK DYNAMICS</div>
+              <h2 style={{ fontSize: 17, fontWeight: 700, color: 'white', lineHeight: 1.6 }}>{q.q}</h2>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+              {q.options.map((opt, i) => (
+                <button key={opt.id} onClick={() => handleAnswer(opt.score)} style={{
+                  padding: '20px 12px', borderRadius: 20,
+                  border: `2px solid ${roleColors[i]}44`,
+                  background: `${roleColors[i]}12`,
+                  color: 'white', textAlign: 'center',
+                  cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.25s'
+                }}
+                onMouseOver={e => { e.currentTarget.style.background=`${roleColors[i]}28`; e.currentTarget.style.borderColor=roleColors[i]; e.currentTarget.style.transform='scale(1.04)'; }}
+                onMouseOut={e => { e.currentTarget.style.background=`${roleColors[i]}12`; e.currentTarget.style.borderColor=`${roleColors[i]}44`; e.currentTarget.style.transform='scale(1)'; }}
+                >
+                  <div style={{ fontSize: 32, marginBottom: 6 }}>{roles[i]}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: roleColors[i], marginBottom: 6 }}>{roleNames[i]}</div>
+                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', lineHeight: 1.4 }}>{opt.text}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── MECHANIC 12: INSTINCT MAP (Test 12 — Wild Signal) ────────────────
+    // "เลือก triggers ที่ดึง wild side ของน้องออกมา"
+    if (mechanic === 'instinct_map') {
+      const wildEmojis = ['🌿','🌙','🌬️','🦎'];
+      const wildColors = ['#1ABC9C','#9B59B6','#3498DB','#E74C3C'];
+      return (
+        <div style={styles.container}>
+          <div style={{...styles.glowOrb, width: 300, height: 300, background: '#1ABC9C', bottom: -100, left: -80}} />
+          <div style={styles.content}>
+            <Header />
+            <div style={{ ...styles.darkCard, marginBottom: 12, background: 'rgba(26,188,156,0.08)', border: '1px solid rgba(26,188,156,0.25)' }}>
+              <div style={{ fontSize: 11, letterSpacing: 2, color: '#1ABC9C', fontWeight: 700, marginBottom: 8 }}>🌿 WILD INSTINCT MAP</div>
+              <h2 style={{ fontSize: 17, fontWeight: 700, color: 'white', lineHeight: 1.6 }}>{q.q}</h2>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {q.options.map((opt, i) => (
+                <button key={opt.id} onClick={() => handleAnswer(opt.score)} style={{
+                  padding: '18px 12px', borderRadius: 18,
+                  border: `2px solid ${wildColors[i]}33`,
+                  background: `${wildColors[i]}10`, color: 'white',
+                  textAlign: 'center', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s'
+                }}
+                onMouseOver={e => { e.currentTarget.style.background=`${wildColors[i]}25`; e.currentTarget.style.borderColor=wildColors[i]; e.currentTarget.style.transform='scale(1.03)'; }}
+                onMouseOut={e => { e.currentTarget.style.background=`${wildColors[i]}10`; e.currentTarget.style.borderColor=`${wildColors[i]}33`; e.currentTarget.style.transform='scale(1)'; }}
+                >
+                  <div style={{ fontSize: 30, marginBottom: 8 }}>{wildEmojis[i]}</div>
+                  <div style={{ fontSize: 12, lineHeight: 1.4 }}>{opt.text}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── DEFAULT FALLBACK (4-button grid) ──────────────────────────────────
+    const optionColors = ['linear-gradient(135deg,#4ECDC4,#44A89A)','linear-gradient(135deg,#6C63FF,#5A52D5)','linear-gradient(135deg,#FF6B6B,#E55555)','linear-gradient(135deg,#FFD93D,#E5C235)'];
     return (
       <div style={styles.container}>
-        <div style={{...styles.glowOrb, width: 200, height: 200, background: currentTopic.color, top: 100, left: -80}} />
+        <div style={{...styles.glowOrb, width: 200, height: 200, background: color, top: 100, left: -80}} />
         <div style={styles.content}>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-            <button onClick={() => setScreen('topic-intro')} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: 'white' }}>←</button>
-            <div style={{ flex: 1, textAlign: 'center' }}>
-              <span style={{ fontSize: 20 }}>{currentTopic.emoji}</span>
-              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', marginLeft: 8 }}>{currentTopic.name}</span>
-            </div>
-            <span style={{ background: currentTopic.color, color: 'white', padding: '6px 14px', borderRadius: 20, fontSize: 14, fontWeight: 700 }}>
-              {currentQuestion + 1}/10
-            </span>
-          </div>
-          <div style={{ height: 6, background: 'rgba(255,255,255,0.1)', borderRadius: 3, marginBottom: 24, overflow: 'hidden' }}>
-            <div style={{ width: `${((currentQuestion + 1) / 10) * 100}%`, height: '100%', background: `linear-gradient(90deg, ${currentTopic.color}, #FFD93D)`, borderRadius: 3, transition: 'width 0.5s ease', boxShadow: `0 0 20px ${currentTopic.color}` }} />
-          </div>
+          <Header />
           <div style={{ ...styles.card, textAlign: 'center' }}>
             <h2 style={{ fontSize: 20, fontWeight: 700, color: '#333', lineHeight: 1.5, marginBottom: 24, minHeight: 60 }}>{q.q}</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -1987,10 +2491,7 @@ export default function MhaStoryApp() {
                   background: optionColors[i], color: 'white', fontSize: 15, fontWeight: 600,
                   textAlign: 'left', lineHeight: 1.4, boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
                   transition: 'transform 0.15s ease', fontFamily: 'inherit'
-                }}
-                onMouseOver={e => e.currentTarget.style.transform='scale(1.02)'}
-                onMouseOut={e => e.currentTarget.style.transform='scale(1)'}
-                >{opt.text}</button>
+                }}>{opt.text}</button>
               ))}
             </div>
           </div>
@@ -2590,50 +3091,6 @@ export default function MhaStoryApp() {
               <button onClick={() => { setViewingResult(null); setScreen('dashboard'); }} style={{ ...styles.btn, ...styles.btnPrimary }}>
                 🧬 ทำ Test ต่อ
               </button>
-            </div>
-
-            {/* Dog Profile CTA */}
-            <div style={{
-              ...styles.darkCard,
-              textAlign: 'center',
-              marginBottom: 16,
-              background: 'linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,107,107,0.12))',
-              border: '1.5px solid rgba(255,215,0,0.4)'
-            }}>
-              <div style={{ fontSize: 36, marginBottom: 10 }}>🧬</div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: 'white', marginBottom: 6 }}>
-                บันทึกผล DNA ของน้อง!
-              </div>
-              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', marginBottom: 16, lineHeight: 1.6 }}>
-                สร้าง Dog Profile เพื่อเก็บผลทดสอบทั้ง 12 Tests<br/>และดู DNA Report ฉบับเต็มของน้อง
-              </div>
-              <button
-                onClick={() => {
-                  setViewingResult(null);
-                  if (user) {
-                    setScreen('dashboard');
-                  } else {
-                    setAuthMode('register');
-                    setScreen('auth');
-                  }
-                }}
-                style={{
-                  ...styles.btn,
-                  background: 'linear-gradient(135deg, #FFD700, #FF6B6B)',
-                  color: 'white',
-                  fontWeight: 700,
-                  fontSize: 16,
-                  border: 'none',
-                  boxShadow: '0 4px 20px rgba(255,215,0,0.3)'
-                }}
-              >
-                🐾 สร้าง Dog Profile
-              </button>
-              {user && (
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 10 }}>
-                  ✓ เข้าสู่ระบบแล้ว — ไปที่ Dashboard
-                </div>
-              )}
             </div>
 
             {/* Share Button */}
