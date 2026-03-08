@@ -2592,6 +2592,50 @@ export default function MhaStoryApp() {
               </button>
             </div>
 
+            {/* Dog Profile CTA */}
+            <div style={{
+              ...styles.darkCard,
+              textAlign: 'center',
+              marginBottom: 16,
+              background: 'linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,107,107,0.12))',
+              border: '1.5px solid rgba(255,215,0,0.4)'
+            }}>
+              <div style={{ fontSize: 36, marginBottom: 10 }}>🧬</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: 'white', marginBottom: 6 }}>
+                บันทึกผล DNA ของน้อง!
+              </div>
+              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', marginBottom: 16, lineHeight: 1.6 }}>
+                สร้าง Dog Profile เพื่อเก็บผลทดสอบทั้ง 12 Tests<br/>และดู DNA Report ฉบับเต็มของน้อง
+              </div>
+              <button
+                onClick={() => {
+                  setViewingResult(null);
+                  if (user) {
+                    setScreen('dashboard');
+                  } else {
+                    setAuthMode('register');
+                    setScreen('auth');
+                  }
+                }}
+                style={{
+                  ...styles.btn,
+                  background: 'linear-gradient(135deg, #FFD700, #FF6B6B)',
+                  color: 'white',
+                  fontWeight: 700,
+                  fontSize: 16,
+                  border: 'none',
+                  boxShadow: '0 4px 20px rgba(255,215,0,0.3)'
+                }}
+              >
+                🐾 สร้าง Dog Profile
+              </button>
+              {user && (
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 10 }}>
+                  ✓ เข้าสู่ระบบแล้ว — ไปที่ Dashboard
+                </div>
+              )}
+            </div>
+
             {/* Share Button */}
             <button style={{ ...styles.btn, ...styles.btnGhost, marginBottom: 24 }}>
               📤 แชร์ผลให้เพื่อน
