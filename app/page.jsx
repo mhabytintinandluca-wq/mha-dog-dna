@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 
+// MHA' Story Dog DNA Quiz Platform - Gamification v2
 export default function MhaStoryApp() {
   const [screen, setScreen] = useState('landing');
   const [currentTopic, setCurrentTopic] = useState(null);
@@ -15,8 +16,6 @@ export default function MhaStoryApp() {
   const [selectedBreed, setSelectedBreed] = useState('');
   const [selectedBadge, setSelectedBadge] = useState(null);
   const [showBadgeModal, setShowBadgeModal] = useState(false);
-  const [showDimensionPopup, setShowDimensionPopup] = useState(false);
-  const [viewingResult, setViewingResult] = useState(null);
 
   // Popular dog breeds
   const dogBreeds = [
@@ -25,38 +24,241 @@ export default function MhaStoryApp() {
     'ไซบีเรียน ฮัสกี้', 'คอร์กี้', 'ชิสุ', 'มอลทีส',
     'แจ็ค รัสเซล', 'บางแก้ว', 'ไทยหลังอาน', 'พันทาง/มิกซ์'
   ];
+  const [viewingResult, setViewingResult] = useState(null);
 
   // All Topics Data
   const allTopics = [
-    { id: 1, name: 'The Stare Code', emoji: '👁️', dimension: 'BOND', dimensionEmoji: '💛', color: '#FF6B6B', island: 1, shortDesc: 'ค้นพบความลึกของสายตาที่เชื่อมโยงหัวใจ', scienceFact: 'การสบตากับน้องหมาช่วยกระตุ้นการหลั่ง Oxytocin เหมือนกับความรักระหว่างแม่กับลูก' },
-    { id: 2, name: 'Empathy DNA', emoji: '😢', dimension: 'BOND', dimensionEmoji: '💛', color: '#FF8E53', island: 1, shortDesc: 'น้องหมารับรู้อารมณ์คุณได้แค่ไหน?', scienceFact: 'สุนัขสามารถแยกแยะสีหน้าที่แสดงอารมณ์ของมนุษย์ได้' },
-    { id: 3, name: '6th Sense Test', emoji: '🚪', dimension: 'MIND', dimensionEmoji: '🧠', color: '#4ECDC4', island: 1, shortDesc: 'น้องหมารู้ล่วงหน้าก่อนคุณทำอะไร?', scienceFact: 'สุนัขสามารถจดจำ routine และคาดการณ์เหตุการณ์ล่วงหน้าได้' },
-    { id: 4, name: 'Food Blueprint', emoji: '🍖', dimension: 'DRIVE', dimensionEmoji: '⚡', color: '#FF6B6B', island: 2, shortDesc: 'อาหารมีอิทธิพลต่อน้องหมาแค่ไหน?', scienceFact: 'ยีน POMC มีผลต่อความอยากอาหารและน้ำหนักในสุนัข' },
-    { id: 5, name: 'Play Personality', emoji: '🎾', dimension: 'DRIVE', dimensionEmoji: '⚡', color: '#FFD93D', island: 2, shortDesc: 'น้องหมาชอบเล่นแบบไหน?', scienceFact: 'รูปแบบการเล่นเชื่อมโยงกับ attachment style' },
-    { id: 6, name: 'IQ Signal', emoji: '🧠', dimension: 'MIND', dimensionEmoji: '🧠', color: '#4ECDC4', island: 2, shortDesc: 'น้องหมาฉลาดแค่ไหน?', scienceFact: 'สุนัขมี social cognition skills ใกล้เคียงเด็กมนุษย์' },
-    { id: 7, name: 'Mind Reader', emoji: '🔮', dimension: 'MIND', dimensionEmoji: '🧠', color: '#9B59B6', island: 3, shortDesc: 'น้องหมาอ่านใจคุณได้ไหม?', scienceFact: 'สุนัขสามารถติดตามสายตาและเข้าใจการชี้ของมนุษย์' },
-    { id: 8, name: 'Secret Language', emoji: '🗣️', dimension: 'MIND', dimensionEmoji: '🧠', color: '#3498DB', island: 3, shortDesc: 'น้องหมาสื่อสารกับคุณยังไง?', scienceFact: 'เสียงเห่าของสุนัขมีความหมายเฉพาะตัว' },
-    { id: 9, name: 'Nerve Map', emoji: '⚡', dimension: 'NERVE', dimensionEmoji: '🛡️', color: '#E74C3C', island: 3, shortDesc: 'น้องหมากลัวอะไรบ้าง?', scienceFact: 'ความกลัวเสียงดังเป็นปัญหาพฤติกรรมที่พบบ่อย' },
-    { id: 10, name: 'Alone Index', emoji: '🧳', dimension: 'NERVE', dimensionEmoji: '🛡️', color: '#E67E22', island: 4, shortDesc: 'น้องหมาอยู่คนเดียวได้ไหม?', scienceFact: 'Separation anxiety พบได้ใน 20-40% ของสุนัข' },
-    { id: 11, name: 'Pack Code', emoji: '🐺', dimension: 'WILD', dimensionEmoji: '🌍', color: '#2ECC71', island: 4, shortDesc: 'น้องหมาเข้าฝูงยังไง?', scienceFact: 'สุนัขมี social hierarchy สืบทอดจากหมาป่า' },
-    { id: 12, name: 'Wild Signal', emoji: '🌿', dimension: 'WILD', dimensionEmoji: '🌍', color: '#1ABC9C', island: 4, shortDesc: 'สัญชาตญาณดั้งเดิมของน้องหมา', scienceFact: 'พฤติกรรมวนก่อนนอนและขุดดินเป็นสัญชาตญาณดั้งเดิม' }
+    { 
+      id: 1, 
+      name: 'The Stare Code', 
+      emoji: '👁️', 
+      dimension: 'BOND',
+      dimensionEmoji: '💛',
+      color: '#FF6B6B',
+      island: 1,
+      shortDesc: 'ค้นพบความลึกของสายตาที่เชื่อมโยงหัวใจ',
+      fullDesc: 'ทดสอบว่าน้องหมาของคุณใช้การสบตาในการสื่อสารความรักและความผูกพันอย่างไร การสบตากระตุ้น Oxytocin ทั้งในคนและน้องหมา!',
+      scienceFact: 'การสบตากับน้องหมาช่วยกระตุ้นการหลั่ง Oxytocin เหมือนกับความรักระหว่างแม่กับลูก',
+      reference: 'Nagasawa et al. (2015), Science',
+      duration: '3 นาที',
+      questions: 10
+    },
+    { 
+      id: 2, 
+      name: 'Empathy DNA', 
+      emoji: '😢', 
+      dimension: 'BOND',
+      dimensionEmoji: '💛',
+      color: '#FF8E53',
+      island: 1,
+      shortDesc: 'น้องหมารับรู้อารมณ์คุณได้แค่ไหน?',
+      fullDesc: 'ทดสอบว่าน้องหมาของคุณมีความสามารถในการอ่านและตอบสนองต่ออารมณ์ของคุณอย่างไร',
+      scienceFact: 'สุนัขสามารถแยกแยะสีหน้าที่แสดงอารมณ์ของมนุษย์ได้ และตอบสนองด้วยความเห็นอกเห็นใจ',
+      reference: 'Custance & Mayer (2012), Animal Cognition',
+      duration: '3 นาที',
+      questions: 10
+    },
+    { 
+      id: 3, 
+      name: '6th Sense Test', 
+      emoji: '🚪', 
+      dimension: 'MIND',
+      dimensionEmoji: '🧠',
+      color: '#4ECDC4',
+      island: 1,
+      shortDesc: 'น้องหมารู้ล่วงหน้าก่อนคุณทำอะไร?',
+      fullDesc: 'ทดสอบความสามารถในการคาดการณ์และอ่าน pattern พฤติกรรมของเจ้าของ',
+      scienceFact: 'สุนัขสามารถจดจำ routine และคาดการณ์เหตุการณ์ล่วงหน้าได้อย่างแม่นยำ',
+      reference: 'Sheldrake & Smart (2000), Journal of Scientific Exploration',
+      duration: '3 นาที',
+      questions: 10
+    },
+    { 
+      id: 4, 
+      name: 'Food Blueprint', 
+      emoji: '🍖', 
+      dimension: 'DRIVE',
+      dimensionEmoji: '⚡',
+      color: '#FF6B6B',
+      island: 2,
+      shortDesc: 'อาหารมีอิทธิพลต่อน้องหมาแค่ไหน?',
+      fullDesc: 'ทดสอบ Food Motivation และพฤติกรรมการกินที่บ่งบอกถึง DRIVE dimension',
+      scienceFact: 'ยีน POMC มีผลต่อความอยากอาหารและน้ำหนักในสุนัข โดยเฉพาะ Labrador Retriever',
+      reference: 'Raffan et al. (2016), Cell Metabolism',
+      duration: '3 นาที',
+      questions: 10
+    },
+    { 
+      id: 5, 
+      name: 'Play Personality', 
+      emoji: '🎾', 
+      dimension: 'DRIVE',
+      dimensionEmoji: '⚡',
+      color: '#FFD93D',
+      island: 2,
+      shortDesc: 'น้องหมาชอบเล่นแบบไหน?',
+      fullDesc: 'ค้นพบสไตล์การเล่นที่บอกถึงพลังงานและแรงขับของน้องหมา',
+      scienceFact: 'รูปแบบการเล่นเชื่อมโยงกับ attachment style และความสัมพันธ์กับเจ้าของ',
+      reference: 'Rooney & Bradshaw (2003), Applied Animal Behaviour Science',
+      duration: '3 นาที',
+      questions: 10
+    },
+    { 
+      id: 6, 
+      name: 'IQ Signal', 
+      emoji: '🧠', 
+      dimension: 'MIND',
+      dimensionEmoji: '🧠',
+      color: '#4ECDC4',
+      island: 2,
+      shortDesc: 'น้องหมาฉลาดแค่ไหน?',
+      fullDesc: 'ทดสอบความสามารถในการเรียนรู้และแก้ปัญหาของน้องหมา',
+      scienceFact: 'สุนัขมี social cognition skills ที่ใกล้เคียงกับเด็กมนุษย์',
+      reference: 'Hare & Tomasello (2005), Trends in Cognitive Sciences',
+      duration: '3 นาที',
+      questions: 10
+    },
+    { 
+      id: 7, 
+      name: 'Mind Reader', 
+      emoji: '🔮', 
+      dimension: 'MIND',
+      dimensionEmoji: '🧠',
+      color: '#9B59B6',
+      island: 3,
+      shortDesc: 'น้องหมาอ่านใจคุณได้ไหม?',
+      fullDesc: 'ทดสอบความสามารถในการอ่านสัญญาณและเจตนาของเจ้าของ',
+      scienceFact: 'สุนัขสามารถติดตามสายตาและเข้าใจการชี้ของมนุษย์ ต่างจากหมาป่า',
+      reference: 'Miklosi et al. (2003), Current Biology',
+      duration: '3 นาที',
+      questions: 10
+    },
+    { 
+      id: 8, 
+      name: 'Secret Language', 
+      emoji: '🗣️', 
+      dimension: 'MIND',
+      dimensionEmoji: '🧠',
+      color: '#3498DB',
+      island: 3,
+      shortDesc: 'น้องหมาสื่อสารกับคุณยังไง?',
+      fullDesc: 'ค้นพบภาษาลับที่น้องหมาใช้สื่อสารกับคุณ',
+      scienceFact: 'เสียงเห่าของสุนัขมีความหมายเฉพาะตัวและแตกต่างกันในแต่ละสถานการณ์',
+      reference: 'Yin & McCowan (2004), Animal Behaviour',
+      duration: '3 นาที',
+      questions: 10
+    },
+    { 
+      id: 9, 
+      name: 'Nerve Map', 
+      emoji: '⚡', 
+      dimension: 'NERVE',
+      dimensionEmoji: '🛡️',
+      color: '#E74C3C',
+      island: 3,
+      shortDesc: 'น้องหมากลัวอะไรบ้าง?',
+      fullDesc: 'ทำแผนที่ความกลัวและความวิตกกังวลของน้องหมา',
+      scienceFact: 'ความกลัวเสียงดังเป็นปัญหาพฤติกรรมที่พบบ่อยในสุนัข',
+      reference: 'Shull et al. (2021), Frontiers in Veterinary Science',
+      duration: '3 นาที',
+      questions: 10
+    },
+    { 
+      id: 10, 
+      name: 'Alone Index', 
+      emoji: '🧳', 
+      dimension: 'NERVE',
+      dimensionEmoji: '🛡️',
+      color: '#E67E22',
+      island: 4,
+      shortDesc: 'น้องหมาอยู่คนเดียวได้ไหม?',
+      fullDesc: 'วัดระดับ Separation Anxiety ของน้องหมา',
+      scienceFact: 'Separation anxiety พบได้ใน 20-40% ของสุนัขทั่วโลก',
+      reference: 'Flannigan & Dodman (2001), JAVMA',
+      duration: '3 นาที',
+      questions: 10
+    },
+    { 
+      id: 11, 
+      name: 'Pack Code', 
+      emoji: '🐺', 
+      dimension: 'WILD',
+      dimensionEmoji: '🌍',
+      color: '#2ECC71',
+      island: 4,
+      shortDesc: 'น้องหมาเข้าฝูงยังไง?',
+      fullDesc: 'ทดสอบพฤติกรรมทางสังคมกับสุนัขตัวอื่น',
+      scienceFact: 'สุนัขมี social hierarchy และพฤติกรรมฝูงที่สืบทอดมาจากหมาป่า',
+      reference: 'Barrera et al. (2011), Behavioural Processes',
+      duration: '3 นาที',
+      questions: 10
+    },
+    { 
+      id: 12, 
+      name: 'Wild Signal', 
+      emoji: '🌿', 
+      dimension: 'WILD',
+      dimensionEmoji: '🌍',
+      color: '#1ABC9C',
+      island: 4,
+      shortDesc: 'สัญชาตญาณดั้งเดิมของน้องหมา',
+      fullDesc: 'ค้นพบพฤติกรรมสัญชาตญาณที่ซ่อนอยู่ใน DNA',
+      scienceFact: 'พฤติกรรมเช่น การวนก่อนนอน และการขุดดิน เป็นสัญชาตญาณดั้งเดิม',
+      reference: 'Coppinger & Coppinger (2001), Dogs: A Startling New Understanding',
+      duration: '3 นาที',
+      questions: 10
+    }
   ];
 
   const islands = [
-    { id: 1, name: 'Heart Bond', emoji: '💛', color: '#FFD93D', topics: [1, 2, 3] },
-    { id: 2, name: 'Energy Drive', emoji: '⚡', color: '#FF6B6B', topics: [4, 5, 6] },
-    { id: 3, name: 'Mind Power', emoji: '🧠', color: '#4ECDC4', topics: [7, 8, 9] },
-    { id: 4, name: 'Wild Instinct', emoji: '🌍', color: '#9B59B6', topics: [10, 11, 12] }
+    { id: 1, name: 'Heart Bond', emoji: '🐾', color: '#FFD93D', topics: [1, 2, 3] },
+    { id: 2, name: 'Energy Drive', emoji: '🐾', color: '#FF6B6B', topics: [4, 5, 6] },
+    { id: 3, name: 'Mind Power', emoji: '🐾', color: '#4ECDC4', topics: [7, 8, 9] },
+    { id: 4, name: 'Wild Instinct', emoji: '🐾', color: '#9B59B6', topics: [10, 11, 12] }
   ];
 
+  // Dimension Info for popup
   const dimensionInfo = [
-    { name: 'BOND', emoji: '💛', color: '#FFD93D', gene: 'OXTR — Oxytocin Receptor', desc: 'วัดระดับความผูกพันและความรักที่น้องหมามีต่อเจ้าของ' },
-    { name: 'DRIVE', emoji: '⚡', color: '#FF6B6B', gene: 'POMC — Energy & Appetite', desc: 'วัดระดับพลังงาน แรงจูงใจ และความกระตือรือร้น' },
-    { name: 'MIND', emoji: '🧠', color: '#4ECDC4', gene: 'WBSCR17 — Social Cognition', desc: 'วัดความฉลาดทางสังคมและความสามารถในการอ่านใจคน' },
-    { name: 'NERVE', emoji: '🛡️', color: '#9B59B6', gene: 'SLC6A4 — Serotonin Transporter', desc: 'วัดความมั่นคงทางอารมณ์และการรับมือกับความเครียด' },
-    { name: 'WILD', emoji: '🌍', color: '#2ECC71', gene: 'DRD4 — Dopamine Receptor', desc: 'วัดระดับสัญชาตญาณดั้งเดิมและความรักในการผจญภัย' }
+    { 
+      name: 'BOND', 
+      emoji: '💛', 
+      color: '#FFD93D', 
+      gene: 'OXTR — Oxytocin Receptor',
+      desc: 'วัดระดับความผูกพันและความรักที่น้องหมามีต่อเจ้าของ ยีน OXTR ควบคุมการหลั่ง Oxytocin (ฮอร์โมนแห่งความรัก) ซึ่งส่งผลต่อความใกล้ชิดและความไว้วางใจ'
+    },
+    { 
+      name: 'DRIVE', 
+      emoji: '⚡', 
+      color: '#FF6B6B', 
+      gene: 'POMC — Energy & Appetite',
+      desc: 'วัดระดับพลังงาน แรงจูงใจ และความกระตือรือร้น ยีน POMC มีผลต่อความอยากอาหารและระดับพลังงาน พบว่ามีความแตกต่างชัดเจนในสายพันธุ์ต่างๆ'
+    },
+    { 
+      name: 'MIND', 
+      emoji: '🧠', 
+      color: '#4ECDC4', 
+      gene: 'WBSCR17 — Social Cognition',
+      desc: 'วัดความฉลาดทางสังคมและความสามารถในการอ่านใจคน ยีน WBSCR17 เกี่ยวข้องกับความสามารถในการเข้าใจท่าทางและอารมณ์ของมนุษย์'
+    },
+    { 
+      name: 'NERVE', 
+      emoji: '🛡️', 
+      color: '#9B59B6', 
+      gene: 'SLC6A4 — Serotonin Transporter',
+      desc: 'วัดความมั่นคงทางอารมณ์และการรับมือกับความเครียด ยีน SLC6A4 ควบคุมระดับ Serotonin ซึ่งส่งผลต่อความวิตกกังวลและความกลัว'
+    },
+    { 
+      name: 'WILD', 
+      emoji: '🌍', 
+      color: '#2ECC71', 
+      gene: 'DRD4 — Dopamine Receptor',
+      desc: 'วัดระดับสัญชาตญาณดั้งเดิมและความรักในการผจญภัย ยีน DRD4 เกี่ยวข้องกับพฤติกรรมแสวงหาสิ่งใหม่และความอยากรู้อยากเห็น'
+    }
   ];
 
+  const [showDimensionPopup, setShowDimensionPopup] = useState(false);
+
+  // Quiz questions for Topic 1
   // Quiz Questions for all 12 Topics
   const topicQuestions = {
     1: [
@@ -156,68 +358,171 @@ export default function MhaStoryApp() {
       { q: 'คุณรู้สึกว่าคุยกับน้องได้ไหม?', emoji: '💬' }
     ],
     9: [
-      { q: 'น้องกลัวเสียงพลุไหม?', emoji: '🎆' },
-      { q: 'น้องกลัวฟ้าร้องไหม?', emoji: '⛈️' },
-      { q: 'น้องกลัวเสียงเครื่องดูดฝุ่นไหม?', emoji: '🧹' },
-      { q: 'น้องตกใจง่ายไหม?', emoji: '😱' },
-      { q: 'น้องกลัวคนแปลกหน้าไหม?', emoji: '👤' },
-      { q: 'น้องกลัวการไปหาหมอไหม?', emoji: '💉' },
-      { q: 'น้องกลัวการอาบน้ำไหม?', emoji: '🚿' },
-      { q: 'น้องกลัวรถยนต์ไหม?', emoji: '🚗' },
-      { q: 'น้องฟื้นตัวเร็วหลังตกใจไหม?', emoji: '💪' },
-      { q: 'น้องมีที่ซ่อนประจำเวลากลัวไหม?', emoji: '🏠' }
+      { q: 'น้องตกใจเสียงดังไหม?', emoji: '💥' },
+      { q: 'น้องกลัวพลุหรือฟ้าร้องไหม?', emoji: '🎆' },
+      { q: 'น้องสงบในสถานการณ์ใหม่ๆ ไหม?', emoji: '🆕' },
+      { q: 'น้องผ่อนคลายเมื่อมีคนแปลกหน้าไหม?', emoji: '👤' },
+      { q: 'น้องปรับตัวกับการเปลี่ยนแปลงได้เร็วไหม?', emoji: '🔄' },
+      { q: 'น้องกล้าเข้าหาสิ่งใหม่ๆ ไหม?', emoji: '🌟' },
+      { q: 'น้องนอนหลับสบายในที่แปลกไหม?', emoji: '😴' },
+      { q: 'น้องไม่หวาดกลัวเมื่อไปหาหมอไหม?', emoji: '🏥' },
+      { q: 'น้องเล่นกับเด็กได้อย่างใจเย็นไหม?', emoji: '👶' },
+      { q: 'น้องฟื้นตัวจากความกลัวได้เร็วไหม?', emoji: '⚡' }
     ],
     10: [
-      { q: 'น้องร้องเวลาคุณออกจากบ้านไหม?', emoji: '😭' },
-      { q: 'น้องทำลายของเวลาอยู่คนเดียวไหม?', emoji: '💔' },
-      { q: 'น้องเดินวนไปมาเวลาคุณเตรียมออกไหม?', emoji: '🔄' },
-      { q: 'น้องหอบหรือหายใจแรงเวลาอยู่คนเดียวไหม?', emoji: '😰' },
-      { q: 'น้องนอนหลับได้เวลาคุณไม่อยู่ไหม?', emoji: '😴' },
-      { q: 'น้องกินอาหารได้เวลาคุณไม่อยู่ไหม?', emoji: '🍽️' },
-      { q: 'น้องมีความสุขเมื่ออยู่กับคนอื่นไหม?', emoji: '👥' },
-      { q: 'น้องตื่นเต้นมากเวลาคุณกลับบ้านไหม?', emoji: '🎉' },
-      { q: 'น้องติดคุณมากเวลาคุณอยู่บ้านไหม?', emoji: '🤗' },
-      { q: 'น้องอยู่บ้านคนเดียวได้หลายชั่วโมงไหม?', emoji: '⏰' }
+      { q: 'น้องอยู่บ้านคนเดียวได้สบายไหม?', emoji: '🏠' },
+      { q: 'น้องร้องหรือหอนเมื่อคุณออกไปไหม?', emoji: '😭' },
+      { q: 'น้องทำลายของเมื่ออยู่คนเดียวไหม?', emoji: '💔' },
+      { q: 'น้องเครียดเมื่อคุณเตรียมออกจากบ้านไหม?', emoji: '😰' },
+      { q: 'น้องติดตามคุณไปทุกที่ในบ้านไหม?', emoji: '🚶' },
+      { q: 'น้องต้องนอนในห้องเดียวกับคุณไหม?', emoji: '🛏️' },
+      { q: 'น้องตื่นเต้นเกินเมื่อคุณกลับบ้านไหม?', emoji: '🎉' },
+      { q: 'น้องสงบลงได้เองเมื่ออยู่คนเดียวไหม?', emoji: '😌' },
+      { q: 'น้องเล่นของเล่นคนเดียวได้ไหม?', emoji: '🧸' },
+      { q: 'น้องนอนสบายเมื่อคุณไม่อยู่ห้องไหม?', emoji: '💤' }
     ],
     11: [
-      { q: 'น้องเล่นกับสุนัขตัวอื่นได้ดีไหม?', emoji: '🐕‍🦺' },
-      { q: 'น้องเป็นตัวเริ่มเล่นก่อนไหม?', emoji: '🎯' },
-      { q: 'น้องยอมให้สุนัขตัวอื่นนำไหม?', emoji: '👑' },
-      { q: 'น้องแบ่งของเล่นกับสุนัขอื่นไหม?', emoji: '🧸' },
-      { q: 'น้องหลีกเลี่ยงความขัดแย้งไหม?', emoji: '🕊️' },
-      { q: 'น้องเข้าหาสุนัขตัวอื่นก่อนไหม?', emoji: '👋' },
-      { q: 'น้องปกป้องคุณจากสุนัขตัวอื่นไหม?', emoji: '🛡️' },
-      { q: 'น้องอ่านภาษากายสุนัขตัวอื่นได้ไหม?', emoji: '👀' },
-      { q: 'น้องสงบเวลาอยู่ในฝูงไหม?', emoji: '😌' },
-      { q: 'น้องมีเพื่อนสุนัขที่สนิทไหม?', emoji: '❤️' }
+      { q: 'น้องเป็นผู้นำในกลุ่มน้องหมาไหม?', emoji: '👑' },
+      { q: 'น้องยอมให้น้องหมาตัวอื่นนำไหม?', emoji: '🤝' },
+      { q: 'น้องปกป้องอาหารของตัวเองไหม?', emoji: '🍖' },
+      { q: 'น้องเข้ากับน้องหมาตัวใหม่ได้ง่ายไหม?', emoji: '🐕' },
+      { q: 'น้องมีลำดับชั้นกับน้องหมาในบ้านไหม?', emoji: '📊' },
+      { q: 'น้องแสดงอำนาจเหนือน้องหมาตัวอื่นไหม?', emoji: '💪' },
+      { q: 'น้องแบ่งปันของเล่นกับน้องหมาตัวอื่นไหม?', emoji: '🧸' },
+      { q: 'น้องเล่นตามกฎกับน้องหมาตัวอื่นไหม?', emoji: '📜' },
+      { q: 'น้องปกป้องครอบครัวจากน้องหมาแปลกหน้าไหม?', emoji: '🛡️' },
+      { q: 'น้องอยู่ในกลุ่มน้องหมาได้อย่างสงบไหม?', emoji: '☮️' }
     ],
     12: [
-      { q: 'น้องชอบขุดดินไหม?', emoji: '🕳️' },
       { q: 'น้องไล่จับสัตว์เล็กๆ ไหม?', emoji: '🐿️' },
-      { q: 'น้องหอนตามเสียงไซเรนไหม?', emoji: '🚨' },
-      { q: 'น้องวนก่อนนอนไหม?', emoji: '🔄' },
-      { q: 'น้องซุกอาหารไว้กินทีหลังไหม?', emoji: '🦴' },
-      { q: 'น้องดมกลิ่นนานเวลาเดินเล่นไหม?', emoji: '👃' },
-      { q: 'น้องกลิ้งตัวบนหญ้าไหม?', emoji: '🌿' },
-      { q: 'น้องตื่นตัวเวลาเห็นสัตว์อื่นไหม?', emoji: '🦅' },
-      { q: 'น้องชอบสำรวจที่ใหม่ๆ ไหม?', emoji: '🗺️' },
-      { q: 'น้องมีสัญชาตญาณล่าเหยื่อไหม?', emoji: '🐺' }
+      { q: 'น้องขุดดินบ่อยไหม?', emoji: '🕳️' },
+      { q: 'น้องหอนเหมือนหมาป่าไหม?', emoji: '🌙' },
+      { q: 'น้องชอบดมกลิ่นทุกอย่างไหม?', emoji: '👃' },
+      { q: 'น้องตื่นตัวกับเสียงในธรรมชาติไหม?', emoji: '🌲' },
+      { q: 'น้องชอบเล่นน้ำหรือโคลนไหม?', emoji: '💦' },
+      { q: 'น้องเคี้ยวกิ่งไม้หรือของธรรมชาติไหม?', emoji: '🪵' },
+      { q: 'น้องมีสัญชาตญาณล่าเหยื่อสูงไหม?', emoji: '🎯' },
+      { q: 'น้องชอบอยู่กลางแจ้งมากกว่าในบ้านไหม?', emoji: '☀️' },
+      { q: 'น้องกลิ้งบนหญ้าหรือพื้นดินไหม?', emoji: '🌀' }
     ]
   };
+  
+  // Get questions for current topic
+  const quizQuestions = currentTopic ? topicQuestions[currentTopic.id] || topicQuestions[1] : topicQuestions[1];
 
-  const quizQuestions = currentTopic ? topicQuestions[currentTopic.id] || topicQuestions[1] : [];
-
-  const isTopicCompleted = (topicId) => !!completedTopics[topicId];
-  const isTopicUnlocked = (topicId) => {
-    if (topicId === 1) return true;
-    return isTopicCompleted(topicId - 1);
+  // Topic-specific personality configs
+  const topicPersonalityConfig = {
+    1: { name: 'The Stare Code', dimension: 'BOND', gene: 'OXTR', types: { high: 'Soul Gazer', medium: 'Heart Reader', low: 'Casual Connector', veryLow: 'Independent Spirit' }, emojis: { high: '🌟', medium: '💕', low: '🤝', veryLow: '🦊' } },
+    2: { name: 'Empathy DNA', dimension: 'BOND', gene: 'Mirror Neuron', types: { high: 'Emotion Sponge', medium: 'Comfort Buddy', low: 'Chill Observer', veryLow: 'Zen Master' }, emojis: { high: '🫂', medium: '🤗', low: '😎', veryLow: '🧘' } },
+    3: { name: '6th Sense', dimension: 'BOND', gene: 'Sensory Genes', types: { high: 'Psychic Pup', medium: 'Keen Observer', low: 'Easy Going', veryLow: 'Chill Dude' }, emojis: { high: '🔮', medium: '🦉', low: '😊', veryLow: '😴' } },
+    4: { name: 'Food Blueprint', dimension: 'DRIVE', gene: 'POMC', types: { high: 'Food Fanatic', medium: 'Balanced Eater', low: 'Picky Eater', veryLow: 'Food Skeptic' }, emojis: { high: '🤤', medium: '🍽️', low: '🤔', veryLow: '🙄' } },
+    5: { name: 'Play Personality', dimension: 'DRIVE', gene: 'DRD4', types: { high: 'Play Monster', medium: 'Active Player', low: 'Couch Potato', veryLow: 'Zen Sleeper' }, emojis: { high: '🎉', medium: '🐕', low: '🛋️', veryLow: '😴' } },
+    6: { name: 'IQ Signal', dimension: 'DRIVE', gene: 'Brain Dev', types: { high: 'Genius Pup', medium: 'Smart Cookie', low: 'Sweet Simpleton', veryLow: 'Lovable Goofball' }, emojis: { high: '🎓', medium: '🍪', low: '🥰', veryLow: '🤪' } },
+    7: { name: 'Mind Reader', dimension: 'MIND', gene: 'Visual Processing', types: { high: 'Telepathic', medium: 'Intuitive', low: 'Present Moment', veryLow: 'Surprise Lover' }, emojis: { high: '🧿', medium: '💫', low: '🌸', veryLow: '🎁' } },
+    8: { name: 'Secret Language', dimension: 'MIND', gene: 'Vocal Range', types: { high: 'Communicator', medium: 'Expressive', low: 'Silent Type', veryLow: 'Mystery Dog' }, emojis: { high: '📢', medium: '🎭', low: '🤫', veryLow: '🎭' } },
+    9: { name: 'Nerve Map', dimension: 'NERVE', gene: 'SLC6A4', types: { high: 'Fearless', medium: 'Balanced', low: 'Sensitive', veryLow: 'Anxious' }, emojis: { high: '🦸', medium: '⚖️', low: '🌸', veryLow: '😰' } },
+    10: { name: 'Alone Index', dimension: 'NERVE', gene: 'Attachment', types: { high: 'Independent', medium: 'Adaptable', low: 'Clingy', veryLow: 'Shadow' }, emojis: { high: '🦅', medium: '🔄', low: '🤗', veryLow: '🥺' } },
+    11: { name: 'Pack Code', dimension: 'WILD', gene: 'Social Hierarchy', types: { high: 'Alpha', medium: 'Team Player', low: 'Submissive', veryLow: 'Lone Wolf' }, emojis: { high: '👑', medium: '🤝', low: '🐾', veryLow: '🐺' } },
+    12: { name: 'Wild Signal', dimension: 'WILD', gene: 'Ancient DNA', types: { high: 'Wild Heart', medium: 'Nature Lover', low: 'City Dog', veryLow: 'Couch Companion' }, emojis: { high: '🐺', medium: '🌳', low: '🏙️', veryLow: '🛋️' } }
   };
 
-  const getScore = () => {
-    if (viewingResult) {
-      return completedTopics[viewingResult.id]?.score || 0;
+  // Personality Results - Enhanced with Story, Science, How-To
+  const getPersonality = (score, topicId = 1) => {
+    const config = topicPersonalityConfig[topicId] || topicPersonalityConfig[1];
+    const level = score >= 80 ? 'high' : score >= 60 ? 'medium' : score >= 40 ? 'low' : 'veryLow';
+    
+    const basePersonality = {
+      type: config.types[level],
+      emoji: config.emojis[level],
+      oxytocin: score,
+      topicName: config.name,
+      dimension: config.dimension,
+      gene: config.gene
+    };
+
+    // Topic 1: The Stare Code
+    if (topicId === 1) {
+      if (score >= 80) return {
+        ...basePersonality,
+        tagline: 'น้องหมาที่อ่านใจคุณได้',
+        description: 'น้องหมาของคุณมีความผูกพันระดับลึกสุด! การสบตาของน้องไม่ใช่แค่การมอง แต่เป็นการสื่อสารทางจิตวิญญาณ',
+        traits: ['อ่านใจเจ้าของเก่ง', 'ผูกพันลึกซึ้ง', 'ไวต่ออารมณ์', 'ต้องการความใกล้ชิด'],
+        rarity: 'หายาก — 12%',
+        storyInsight: { title: 'ทำไมน้องหมาบางตัวถึง "อ่านใจ" ได้?', content: 'ในปี 2015 นักวิทยาศาสตร์ญี่ปุ่นค้นพบว่า เมื่อน้องหมาสบตากับเจ้าของนาน 30 นาที ระดับ Oxytocin เพิ่มขึ้นถึง 130%!' },
+        scienceSecret: { title: 'ความลับของยีน OXTR', gene: 'OXTR (Oxytocin Receptor)', content: 'น้องหมาที่มียีน OXTR แบบ high expression จะรู้สึกผูกพันได้ลึกกว่า', funFact: '🧠 น้องหมาสามารถแยกแยะสีหน้า "ยิ้ม" กับ "โกรธ" ได้!' },
+        howToGuide: { title: 'วิธีเสริมสร้าง BOND', tips: [{ icon: '👁️', title: 'Eye Contact Ritual', desc: 'สบตาน้องหมา 5-10 นาทีต่อวัน' }, { icon: '🤲', title: 'Slow Touch Massage', desc: 'ลูบไล้น้องหมาช้าๆ ลด Cortisol' }, { icon: '🗣️', title: 'Talk Like a Friend', desc: 'พูดกับน้องหมาเหมือนคุยกับเพื่อน' }, { icon: '🏠', title: 'Safe Space', desc: 'จัดมุมพิเศษให้น้องหมาอยู่ใกล้คุณ' }] },
+        warnings: { title: 'สิ่งที่ควรระวัง', items: ['อาจมี Separation Anxiety', 'อาจเครียดตามเมื่อเห็นคุณเครียด', 'ต้องการความสม่ำเสมอ'] },
+        activities: { title: 'กิจกรรมที่แนะนำ', items: [{ emoji: '🧘', name: 'นั่งสมาธิด้วยกัน', desc: 'น้องจะนั่งเงียบๆ ข้างคุณ' }, { emoji: '📺', name: 'ดูหนังด้วยกัน', desc: 'ให้น้องนอนข้างๆ' }, { emoji: '🚶', name: 'เดินเล่นช้าๆ', desc: 'ไม่เร่งรีบ ให้เวลาสำรวจ' }] },
+        advice: 'ลองใช้เวลา 10 นาทีต่อวันสบตาและพูดคุยกับน้อง!'
+      };
+      if (score >= 60) return { ...basePersonality, tagline: 'น้องหมาที่รู้ใจคุณเสมอ', description: 'น้องหมาของคุณมีความสามารถในการอ่านอารมณ์สูงมาก!', traits: ['เข้าใจอารมณ์', 'ห่วงใยเจ้าของ', 'ชอบอยู่ใกล้ๆ'], rarity: 'พบได้บ่อย — 35%', storyInsight: { title: 'น้องหมารู้ได้ยังไงว่าคุณเศร้า?', content: 'น้องหมาสามารถอ่านสีหน้าและน้ำเสียงได้พร้อมกัน!' }, scienceSecret: { title: 'Emotional Contagion', gene: 'Mirror Neuron System', content: 'น้องหมามีระบบ Mirror Neuron คล้ายมนุษย์', funFact: '🐕 น้องหมาดมกลิ่นความเครียดได้!' }, howToGuide: { title: 'วิธีดูแล', tips: [{ icon: '😊', title: 'Manage Your Mood', desc: 'น้องจะรับอารมณ์คุณ' }, { icon: '🎉', title: 'Celebrate Together', desc: 'แสดงความดีใจให้น้องเห็น!' }] }, warnings: { title: 'สิ่งที่ควรระวัง', items: ['น้องอาจเครียดตามถ้าบ้านตึงเครียด'] }, activities: { title: 'กิจกรรมที่แนะนำ', items: [{ emoji: '🎾', name: 'เล่น Fetch', desc: 'ส่งพลังบวกให้น้อง' }] }, advice: 'ลองหากิจกรรมใหม่ๆ ทำด้วยกัน!' };
+      if (score >= 40) return { ...basePersonality, tagline: 'น้องหมาที่รักอิสระแต่ยังรักคุณ', description: 'น้องมีความสมดุลระหว่างอิสระและความผูกพัน', traits: ['มั่นใจในตัวเอง', 'รักอิสระ', 'ผูกพันแบบสบายๆ'], rarity: 'พบได้ทั่วไป — 40%', storyInsight: { title: 'ทำไมบางตัว "ไม่ติด" เจ้าของ?', content: 'ความ "ไม่ติด" ไม่ได้แปลว่าไม่รัก!' }, scienceSecret: { title: 'Secure Attachment', gene: 'DRD4 & OXTR Balance', content: 'น้องมีสมดุลระหว่างความอยากสำรวจและความผูกพัน', funFact: '🦮 น้องหมาที่ไม่ติดเจ้าของมักมี Separation Anxiety น้อยกว่า!' }, howToGuide: { title: 'วิธีเชื่อมต่อ', tips: [{ icon: '🎯', title: 'Activity-Based Bonding', desc: 'สร้าง bond ผ่านกิจกรรม' }] }, warnings: { title: 'สิ่งที่ควรระวัง', items: ['อย่าตีความว่าน้องไม่รัก'] }, activities: { title: 'กิจกรรมที่แนะนำ', items: [{ emoji: '🏃', name: 'วิ่งด้วยกัน', desc: 'กิจกรรมที่มีเป้าหมายร่วม' }] }, advice: 'ให้โอกาสน้องได้สำรวจโลกด้วยตัวเอง' };
+      return { ...basePersonality, tagline: 'น้องหมาผู้รักอิสระ', description: 'น้องหมามีจิตวิญญาณอิสระสูง!', traits: ['อิสระ', 'มั่นใจ', 'ฉลาดและรอบคอบ'], rarity: 'ไม่ค่อยพบ — 13%', storyInsight: { title: 'DNA ของหมาป่าที่ยังคงอยู่', content: 'บางตัวมียีนใกล้เคียงหมาป่ามากกว่า' }, scienceSecret: { title: 'Ancient Dog DNA', gene: 'DRD4 Long Allele', content: 'น้องมักมี DRD4 แบบ long allele', funFact: '🐺 Basenji แทบไม่เห่าเพราะ DNA ใกล้หมาป่า!' }, howToGuide: { title: 'วิธีเข้าถึงใจ', tips: [{ icon: '🤫', title: 'Let Them Come to You', desc: 'ให้น้องเข้ามาหาเอง' }] }, warnings: { title: 'สิ่งที่ควรระวัง', items: ['ระวังการหนีออกจากบ้าน'] }, activities: { title: 'กิจกรรมที่แนะนำ', items: [{ emoji: '👃', name: 'Scent Games', desc: 'ซ่อนขนมให้หา' }] }, advice: 'สังเกตพฤติกรรมเล็กๆ น้อยๆ ของน้อง' };
     }
-    return Math.round((answers.reduce((a, b) => a + b, 0) / answers.length) * 100);
+
+    // Generic personality for other topics
+    const taglines = {
+      high: `น้องหมาของคุณมีคะแนน ${config.name} สูงมาก!`,
+      medium: `น้องหมาของคุณมีความสมดุลใน ${config.name}`,
+      low: `น้องหมาของคุณมีคะแนน ${config.name} ต่ำกว่าปกติ`,
+      veryLow: `น้องหมาของคุณเป็นแบบอิสระใน ${config.name}`
+    };
+
+    const descriptions = {
+      high: `น้องหมาของคุณแสดงออกถึง ${config.name} อย่างชัดเจน! นี่คือลักษณะพิเศษที่หาได้ยาก`,
+      medium: `น้องหมาของคุณมีความสมดุลที่ดีในด้าน ${config.name}`,
+      low: `น้องหมาของคุณไม่ได้แสดงออกถึง ${config.name} มากนัก ซึ่งก็มีข้อดีของมัน`,
+      veryLow: `น้องหมาของคุณมีลักษณะที่แตกต่างใน ${config.name} ซึ่งเป็นเอกลักษณ์`
+    };
+
+    const traits = {
+      high: ['พลังงานสูง', 'กระตือรือร้น', 'มีไหวพริบ'],
+      medium: ['สมดุล', 'ปรับตัวได้', 'เข้าสังคมดี'],
+      low: ['สงบ', 'ใจเย็น', 'ไม่วิตก'],
+      veryLow: ['อิสระ', 'มั่นใจ', 'ต้องการพื้นที่']
+    };
+
+    const rarities = {
+      high: 'หายาก — 15%',
+      medium: 'พบได้บ่อย — 45%',
+      low: 'พบได้ทั่วไป — 30%',
+      veryLow: 'หายาก — 10%'
+    };
+
+    return {
+      ...basePersonality,
+      tagline: taglines[level],
+      description: descriptions[level],
+      traits: traits[level],
+      rarity: rarities[level],
+      storyInsight: { 
+        title: `เรื่องน่ารู้เกี่ยวกับ ${config.name}`, 
+        content: `น้องหมาแต่ละตัวมีความแตกต่างในด้าน ${config.name} ซึ่งเกิดจากพันธุกรรมและสิ่งแวดล้อม` 
+      },
+      scienceSecret: { 
+        title: `ยีน ${config.gene}`, 
+        gene: config.gene, 
+        content: `ยีนนี้มีผลต่อพฤติกรรมด้าน ${config.name} ของน้องหมา`, 
+        funFact: `🧬 ${config.dimension} เป็นหนึ่งใน 5 มิติหลักของบุคลิกภาพน้องหมา!` 
+      },
+      howToGuide: { 
+        title: `วิธีดูแลน้องหมาแบบ ${config.types[level]}`, 
+        tips: [
+          { icon: '✨', title: 'เข้าใจความต้องการ', desc: 'สังเกตและเรียนรู้ว่าน้องต้องการอะไร' },
+          { icon: '🎯', title: 'กิจกรรมที่เหมาะสม', desc: 'เลือกกิจกรรมที่เข้ากับบุคลิกภาพน้อง' },
+          { icon: '💚', title: 'ความอดทน', desc: 'ให้เวลาน้องหมาปรับตัว' }
+        ] 
+      },
+      warnings: { title: 'สิ่งที่ควรระวัง', items: ['ทุกบุคลิกภาพมีข้อดีและข้อควรระวัง', 'สังเกตพฤติกรรมของน้องอยู่เสมอ'] },
+      activities: { 
+        title: 'กิจกรรมที่แนะนำ', 
+        items: [
+          { emoji: '🎾', name: 'เล่นด้วยกัน', desc: 'กิจกรรมที่สร้างความสัมพันธ์' },
+          { emoji: '🚶', name: 'เดินเล่น', desc: 'ออกกำลังกายและสำรวจโลก' }
+        ] 
+      },
+      advice: `น้องหมาของคุณเป็น ${config.types[level]} ลองปรับวิธีดูแลให้เข้ากับบุคลิกภาพของน้อง!`
+    };
   };
 
   const handleSwipe = (direction) => {
@@ -251,26 +556,22 @@ export default function MhaStoryApp() {
     });
   };
 
-  const getPersonality = (topicId, score) => {
-    const level = score >= 80 ? 'high' : score >= 60 ? 'medium' : score >= 40 ? 'low' : 'veryLow';
-    const config = {
-      1: { name: 'Soul Gazer', types: { high: 'Soul Gazer 🌟', medium: 'Heart Reader 💕', low: 'Casual Connector 🤝', veryLow: 'Independent Spirit 🦊' }},
-      2: { name: 'Emotion Sponge', types: { high: 'Emotion Sponge 🫂', medium: 'Comfort Buddy 🤗', low: 'Chill Observer 😎', veryLow: 'Zen Master 🧘' }},
-      3: { name: 'Psychic Pup', types: { high: 'Psychic Pup 🔮', medium: 'Keen Observer 🦉', low: 'Easy Going 😊', veryLow: 'Chill Dude 😴' }},
-      4: { name: 'Food Fanatic', types: { high: 'Food Fanatic 🤤', medium: 'Balanced Eater 🍽️', low: 'Picky Eater 🤔', veryLow: 'Food Skeptic 🙄' }},
-      5: { name: 'Play Monster', types: { high: 'Play Monster 🎉', medium: 'Active Player 🐕', low: 'Couch Potato 🛋️', veryLow: 'Zen Sleeper 😴' }},
-      6: { name: 'Genius Pup', types: { high: 'Genius Pup 🎓', medium: 'Smart Cookie 🍪', low: 'Sweet Simpleton 🥰', veryLow: 'Lovable Goofball 🤪' }},
-      7: { name: 'Telepathic', types: { high: 'Telepathic 🧿', medium: 'Intuitive 💫', low: 'Present Moment 🌸', veryLow: 'Surprise Lover 🎁' }},
-      8: { name: 'Communicator', types: { high: 'Master Communicator 📢', medium: 'Expressive 🎭', low: 'Silent Type 🤫', veryLow: 'Mystery Dog 🎭' }},
-      9: { name: 'Fearless', types: { high: 'Fearless Hero 🦸', medium: 'Balanced Brave ⚖️', low: 'Sensitive Soul 🌸', veryLow: 'Anxious Angel 😰' }},
-      10: { name: 'Independent', types: { high: 'Independent 🦅', medium: 'Adaptable 🔄', low: 'Velcro Dog 🤗', veryLow: 'Shadow 🥺' }},
-      11: { name: 'Alpha', types: { high: 'Alpha Leader 👑', medium: 'Team Player 🤝', low: 'Happy Follower 🐾', veryLow: 'Lone Wolf 🐺' }},
-      12: { name: 'Wild Heart', types: { high: 'Wild Heart 🐺', medium: 'Nature Lover 🌳', low: 'City Dog 🏙️', veryLow: 'Couch Companion 🛋️' }}
-    };
-    return config[topicId]?.types[level] || 'Unknown';
+  const getScore = () => {
+    if (viewingResult) {
+      return completedTopics[viewingResult.id]?.score || 0;
+    }
+    return Math.round((answers.reduce((a, b) => a + b, 0) / answers.length) * 100);
   };
 
-  // STYLES
+  const isTopicCompleted = (topicId) => !!completedTopics[topicId];
+  
+  const isTopicUnlocked = (topicId) => {
+    if (topicId === 1) return true;
+    // Check if previous topic is completed
+    return isTopicCompleted(topicId - 1);
+  };
+
+  // Styles
   const styles = {
     container: {
       minHeight: '100vh',
@@ -278,6 +579,11 @@ export default function MhaStoryApp() {
       fontFamily: "'Prompt', 'Segoe UI', sans-serif",
       position: 'relative',
       overflow: 'hidden'
+    },
+    lightContainer: {
+      minHeight: '100vh',
+      background: 'linear-gradient(180deg, #FFF5E6 0%, #FFE4CC 100%)',
+      fontFamily: "'Prompt', 'Segoe UI', sans-serif",
     },
     content: {
       position: 'relative',
@@ -287,53 +593,69 @@ export default function MhaStoryApp() {
       padding: '20px 16px',
       minHeight: '100vh'
     },
+    glowOrb: {
+      position: 'absolute',
+      borderRadius: '50%',
+      filter: 'blur(60px)',
+      opacity: 0.4,
+      pointerEvents: 'none'
+    },
+    card: {
+      background: 'rgba(255,255,255,0.95)',
+      borderRadius: 24,
+      padding: 24,
+      boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+    },
+    darkCard: {
+      background: 'rgba(255,255,255,0.08)',
+      borderRadius: 20,
+      padding: 20,
+      border: '1px solid rgba(255,255,255,0.1)'
+    },
     btn: {
       width: '100%',
-      padding: '16px 24px',
+      padding: '18px 24px',
       borderRadius: 16,
       border: 'none',
-      fontSize: 16,
+      fontSize: 17,
       fontWeight: 700,
       cursor: 'pointer',
       transition: 'all 0.3s ease',
       fontFamily: 'inherit'
     },
     btnPrimary: {
-      background: 'linear-gradient(135deg, #FF6B6B 0%, #FFD93D 100%)',
-      color: '#1a1a2e',
-      boxShadow: '0 8px 25px rgba(255, 107, 107, 0.35)'
+      background: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 50%, #FFC107 100%)',
+      color: 'white',
+      boxShadow: '0 8px 30px rgba(255,107,107,0.5)'
     },
-    btnSecondary: {
-      background: 'rgba(255,255,255,0.1)',
+    btnGhost: {
+      background: 'transparent',
       color: 'white',
       border: '2px solid rgba(255,255,255,0.3)'
     },
-    card: {
-      background: 'rgba(255,255,255,0.08)',
-      borderRadius: 20,
-      padding: 20,
-      backdropFilter: 'blur(10px)',
-      border: '1px solid rgba(255,255,255,0.1)'
+    input: {
+      width: '100%',
+      padding: '16px 20px',
+      borderRadius: 14,
+      border: '2px solid #E8E8E8',
+      fontSize: 16,
+      outline: 'none',
+      background: '#F8F9FA',
+      color: '#333',
+      fontFamily: 'inherit',
+      boxSizing: 'border-box'
     },
     badge: {
+      width: 56,
+      height: 56,
+      borderRadius: 16,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      borderRadius: 16,
+      fontSize: 24,
       cursor: 'pointer',
       transition: 'all 0.3s ease',
       position: 'relative'
-    },
-    input: {
-      width: '100%',
-      padding: '14px 16px',
-      borderRadius: 12,
-      border: '2px solid #E8E8E8',
-      fontSize: 16,
-      fontFamily: 'inherit',
-      outline: 'none',
-      transition: 'border-color 0.3s',
-      boxSizing: 'border-box'
     },
     modal: {
       position: 'fixed',
@@ -342,160 +664,357 @@ export default function MhaStoryApp() {
       right: 0,
       bottom: 0,
       background: 'rgba(0,0,0,0.8)',
-      backdropFilter: 'blur(10px)',
-      zIndex: 100,
       display: 'flex',
-      alignItems: 'flex-end',
-      justifyContent: 'center'
-    },
-    modalContent: {
-      background: 'white',
-      borderRadius: '24px 24px 0 0',
-      width: '100%',
-      maxWidth: 420,
-      maxHeight: '90vh',
-      overflowY: 'auto',
-      padding: 24
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 20,
+      zIndex: 100
     }
   };
 
-  // ==================== RENDER SCREENS ====================
+  // Landing Screen
+  const LandingScreen = () => (
+    <div style={styles.container}>
+      <div style={{...styles.glowOrb, width: 300, height: 300, background: '#FF6B6B', top: -100, right: -100}} />
+      <div style={{...styles.glowOrb, width: 400, height: 400, background: '#4ECDC4', bottom: -150, left: -150}} />
+      
+      <div style={styles.content}>
+        <div style={{ textAlign: 'center', paddingTop: 40 }}>
+          <div style={{ fontSize: 14, letterSpacing: 4, color: 'rgba(255,255,255,0.6)', marginBottom: 16 }}>
+            🐾 MHA' STORY
+          </div>
 
-  // LANDING SCREEN
-  if (screen === 'landing') {
-    return (
-      <div style={styles.container}>
-        <div style={styles.content}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', textAlign: 'center' }}>
-            {/* Floating orbs */}
-            <div style={{ position: 'absolute', width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,107,107,0.3), transparent)', top: '10%', left: '-10%', filter: 'blur(40px)' }} />
-            <div style={{ position: 'absolute', width: 150, height: 150, borderRadius: '50%', background: 'radial-gradient(circle, rgba(78,205,196,0.3), transparent)', bottom: '20%', right: '-5%', filter: 'blur(40px)' }} />
+          {/* Logo & Tagline */}
+          <div style={{ 
+            fontSize: 56, 
+            marginBottom: 12,
+            filter: 'drop-shadow(0 0 30px rgba(255,107,107,0.5))'
+          }}>
+            🧬
+          </div>
+          <div style={{ 
+            fontSize: 28, 
+            fontWeight: 800, 
+            color: 'white',
+            marginBottom: 4,
+            letterSpacing: 1
+          }}>
+            Dog Profile
+          </div>
+          <div style={{ 
+            fontSize: 16, 
+            color: 'rgba(255,255,255,0.6)',
+            fontStyle: 'italic',
+            letterSpacing: 2,
+            marginBottom: 24
+          }}>
+            Science & Secret
+          </div>
 
-            {/* Logo */}
-            <div style={{ fontSize: 80, marginBottom: 20, filter: 'drop-shadow(0 0 30px rgba(255,215,0,0.5))' }}>🧬</div>
-            
-            {/* Title */}
-            <h1 style={{ fontSize: 36, fontWeight: 800, color: 'white', marginBottom: 8, textShadow: '0 2px 20px rgba(255,255,255,0.2)' }}>
-              Dog Profile
-            </h1>
-            <p style={{ fontSize: 18, color: '#FFD93D', marginBottom: 24, fontWeight: 600 }}>
-              Science & Secret
-            </p>
+          <h1 style={{ fontSize: 24, fontWeight: 800, color: 'white', marginBottom: 12, lineHeight: 1.3 }}>
+            น้องหมาของคุณ<br/>
+            <span style={{
+              background: 'linear-gradient(135deg, #FF6B6B, #FFD93D)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}>
+              อ่านใจคุณได้แค่ไหน?
+            </span>
+          </h1>
 
-            {/* Description */}
-            <div style={{ maxWidth: 300, marginBottom: 40 }}>
-              <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 15, lineHeight: 1.8, marginBottom: 16 }}>
-                น้องหมาทุกตัวมี <span style={{ color: '#FFD93D', fontWeight: 600 }}>'บุคลิกภาพ'</span> ที่ซ่อนอยู่ใน DNA
-              </p>
-              <p style={{ color: '#FF6B6B', fontSize: 15, fontWeight: 500 }}>
-                MHA' Story จะช่วยให้คุณค้นพบความลับนั้น
-              </p>
-              <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14, marginTop: 16 }}>
-                เพื่อความเข้าใจที่ลึกซึ้ง และความรักที่เติบโต
-              </p>
+          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', lineHeight: 1.8, marginBottom: 28 }}>
+            น้องหมาทุกตัวมี 'บุคลิกภาพ' ที่ซ่อนอยู่ใน DNA<br/>
+            MHA' Story จะช่วยให้คุณค้นพบความลับนั้น<br/>
+            <span style={{ color: '#FFD93D' }}>เพื่อความเข้าใจที่ลึกซึ้ง และความรักที่เติบโต</span>
+          </p>
+
+          {/* Science Badge */}
+          <div style={{ ...styles.darkCard, padding: 16, marginBottom: 28, textAlign: 'left' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{
+                width: 50, height: 50, borderRadius: 14,
+                background: 'linear-gradient(135deg, #FF6B6B22, #FFD93D22)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24
+              }}>🔬</div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'white', marginBottom: 2 }}>
+                  Based on Real Science
+                </div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>
+                  12 Topics • 5 Dimensions • 8 Archetypes
+                </div>
+              </div>
             </div>
+          </div>
 
-            {/* CTA Button */}
-            <button
-              onClick={() => setScreen('overview')}
-              style={{ ...styles.btn, ...styles.btnPrimary, maxWidth: 280 }}
-            >
-              🐾 เริ่มค้นหา
-            </button>
+          {/* Stats */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginBottom: 28 }}>
+            {[{ num: '12', label: 'Tests' }, { num: '5', label: 'Dimensions' }, { num: 'FREE', label: '' }].map((stat, i) => (
+              <div key={i} style={{ textAlign: 'center' }}>
+                <div style={{ 
+                  fontSize: 24, fontWeight: 800,
+                  background: 'linear-gradient(135deg, #FF6B6B, #FFD93D)',
+                  WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
+                }}>{stat.num}</div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>{stat.label}</div>
+              </div>
+            ))}
+          </div>
 
-            {/* Brand */}
-            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12, marginTop: 40 }}>
-              MHA' BY TIN TIN & LUCA
-            </p>
+          <button 
+            style={{ ...styles.btn, ...styles.btnPrimary, marginBottom: 16 }}
+            onClick={() => setScreen('overview')}
+          >
+            🚀 เริ่มทดสอบเลย — ฟรี!
+          </button>
+
+          <button 
+            style={{ ...styles.btn, ...styles.btnGhost }}
+            onClick={() => setScreen('dashboard')}
+          >
+            มี Dog Profile แล้ว? เข้าสู่ระบบ
+          </button>
+
+          <div style={{ marginTop: 28, fontSize: 12, color: 'rgba(255,255,255,0.4)', display: 'flex', justifyContent: 'center', gap: 16 }}>
+            <span>✓ ไม่ต้องสมัคร</span>
+            <span>✓ ฟรี 100%</span>
+            <span>✓ ดูผลได้ทันที</span>
           </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 
-  // OVERVIEW SCREEN
-  if (screen === 'overview') {
-    const completedCount = Object.keys(completedTopics).length;
-    
+  // Overview Screen - Show all 12 DNA Tests
+  const OverviewScreen = () => {
+    const dimensions = [
+      { name: 'BOND', emoji: '💛', color: '#FFD93D', desc: 'ความผูกพัน' },
+      { name: 'DRIVE', emoji: '⚡', color: '#FF6B6B', desc: 'แรงขับ' },
+      { name: 'MIND', emoji: '🧠', color: '#4ECDC4', desc: 'สติปัญญา' },
+      { name: 'NERVE', emoji: '🛡️', color: '#9B59B6', desc: 'ความมั่นคง' },
+      { name: 'WILD', emoji: '🌍', color: '#2ECC71', desc: 'สัญชาตญาณ' }
+    ];
+
     return (
       <div style={styles.container}>
+        <div style={{...styles.glowOrb, width: 300, height: 300, background: '#FF6B6B', top: -50, right: -100}} />
+        <div style={{...styles.glowOrb, width: 300, height: 300, background: '#4ECDC4', bottom: 100, left: -100}} />
+        <div style={{...styles.glowOrb, width: 200, height: 200, background: '#9B59B6', top: '50%', right: -50}} />
+        
         <div style={styles.content}>
           {/* Header */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-            <div>
-              <h1 style={{ fontSize: 22, fontWeight: 700, color: 'white', marginBottom: 4 }}>🧬 DNA Quiz</h1>
-              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>{completedCount}/12 Tests Completed</p>
-            </div>
-            <button
-              onClick={() => setShowDimensionPopup(true)}
-              style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 12, padding: '8px 12px', color: 'white', fontSize: 13, cursor: 'pointer' }}
-            >
-              ❓ 5 Dimensions
-            </button>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
+            <button onClick={() => setScreen('landing')} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: 'white' }}>←</button>
+            <div style={{ flex: 1 }} />
+            <div style={{ width: 24 }} />
           </div>
 
-          {/* Progress Bar */}
+          {/* Logo & Tagline */}
+          <div style={{ textAlign: 'center', marginBottom: 24 }}>
+            <div style={{ 
+              fontSize: 48, 
+              marginBottom: 8,
+              filter: 'drop-shadow(0 0 30px rgba(255,107,107,0.5))'
+            }}>
+              🧬
+            </div>
+            <div style={{ 
+              fontSize: 24, 
+              fontWeight: 800, 
+              color: 'white',
+              marginBottom: 4
+            }}>
+              Dog Profile
+            </div>
+            <div style={{ 
+              fontSize: 14, 
+              color: 'rgba(255,255,255,0.6)',
+              fontStyle: 'italic',
+              letterSpacing: 2
+            }}>
+              Science & Secret
+            </div>
+          </div>
+
+          {/* 5 Dimensions with Info Button */}
           <div style={{ marginBottom: 24 }}>
-            <div style={{ height: 8, background: 'rgba(255,255,255,0.1)', borderRadius: 4, overflow: 'hidden' }}>
-              <div style={{ width: `${(completedCount / 12) * 100}%`, height: '100%', background: 'linear-gradient(90deg, #FF6B6B, #FFD93D, #4ECDC4)', borderRadius: 4, transition: 'width 0.5s ease' }} />
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              gap: 8,
+              marginBottom: 12 
+            }}>
+              <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>
+                5 DNA DIMENSIONS
+              </span>
+              <button
+                onClick={() => setShowDimensionPopup(true)}
+                style={{
+                  background: 'rgba(255,255,255,0.1)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  borderRadius: '50%',
+                  width: 22,
+                  height: 22,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  fontSize: 12,
+                  color: 'rgba(255,255,255,0.7)'
+                }}
+              >
+                ?
+              </button>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 6, flexWrap: 'wrap' }}>
+              {dimensions.map((dim) => (
+                <div key={dim.name} style={{
+                  background: `${dim.color}22`,
+                  border: `1px solid ${dim.color}44`,
+                  borderRadius: 10,
+                  padding: '6px 10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4
+                }}>
+                  <span style={{ fontSize: 14 }}>{dim.emoji}</span>
+                  <span style={{ fontSize: 10, fontWeight: 600, color: dim.color }}>{dim.name}</span>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Paw Sequences */}
-          {islands.map((island) => {
-            const islandTopics = allTopics.filter(t => island.topics.includes(t.id));
-            const completedInIsland = islandTopics.filter(t => isTopicCompleted(t.id)).length;
+          {/* Subtitle */}
+          <div style={{ textAlign: 'center', marginBottom: 24 }}>
+            <h2 style={{ fontSize: 18, fontWeight: 700, color: 'white', marginBottom: 6, lineHeight: 1.3 }}>
+              ค้นพบ <span style={{ color: '#FFD93D' }}>12 Tests</span> ใน <span style={{ color: '#4ECDC4' }}>4 Paw Sequences</span>
+            </h2>
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>
+              แต่ละ Test จะเปิดเผยความลับใน DNA ของน้องหมา
+            </p>
+          </div>
 
+          {/* 4 Paw Sequences with Badge Grid */}
+          {islands.map((paw) => {
+            const pawTopics = allTopics.filter(t => paw.topics.includes(t.id));
+            
             return (
-              <div key={island.id} style={{ marginBottom: 24 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                  <span style={{ fontSize: 20 }}>{island.emoji}</span>
-                  <span style={{ color: island.color, fontWeight: 600, fontSize: 14 }}>Paw Sequence {island.id}: {island.name}</span>
-                  <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>({completedInIsland}/3)</span>
+              <div key={paw.id} style={{ marginBottom: 24 }}>
+                {/* Paw Sequence Header */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  marginBottom: 12
+                }}>
+                  <div style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 10,
+                    background: `linear-gradient(135deg, ${paw.color}, ${paw.color}CC)`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 16,
+                    boxShadow: `0 4px 15px ${paw.color}44`
+                  }}>
+                    {paw.emoji}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: 'white' }}>
+                      Paw Sequence {paw.id}: {paw.name}
+                    </div>
+                  </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-                  {islandTopics.map((topic) => {
-                    const completed = isTopicCompleted(topic.id);
-                    const unlocked = isTopicUnlocked(topic.id);
+                {/* Badge Grid for this Paw Sequence */}
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'repeat(3, 1fr)', 
+                  gap: 12 
+                }}>
+                  {pawTopics.map((topic) => {
+                    const isCompleted = isTopicCompleted(topic.id);
+                    const isUnlocked = isTopicUnlocked(topic.id);
                     
                     return (
                       <div
                         key={topic.id}
-                        onClick={() => {
-                          if (unlocked) {
-                            setSelectedBadge(topic);
-                            setShowBadgeModal(true);
-                          }
-                        }}
+                        onClick={() => { setSelectedBadge(topic); setShowBadgeModal(true); }}
                         style={{
-                          ...styles.badge,
-                          width: '100%',
-                          height: 80,
-                          flexDirection: 'column',
-                          gap: 4,
-                          background: completed 
+                          background: isCompleted 
                             ? `linear-gradient(135deg, ${topic.color}, ${topic.color}CC)` 
-                            : unlocked 
+                            : isUnlocked 
                               ? `${topic.color}22` 
                               : 'rgba(255,255,255,0.05)',
-                          border: `2px solid ${completed ? topic.color : unlocked ? `${topic.color}66` : 'rgba(255,255,255,0.1)'}`,
-                          boxShadow: completed ? `0 4px 15px ${topic.color}44` : 'none',
-                          opacity: unlocked ? 1 : 0.5
+                          border: `2px solid ${isCompleted ? topic.color : isUnlocked ? `${topic.color}66` : 'rgba(255,255,255,0.1)'}`,
+                          borderRadius: 16,
+                          padding: 16,
+                          cursor: 'pointer',
+                          transition: 'all 0.3s',
+                          position: 'relative',
+                          opacity: isUnlocked ? 1 : 0.6,
+                          boxShadow: isCompleted ? `0 4px 20px ${topic.color}44` : 'none'
                         }}
                       >
-                        <span style={{ fontSize: 28, filter: unlocked ? 'none' : 'grayscale(100%)' }}>{topic.emoji}</span>
-                        <span style={{ fontSize: 9, color: completed ? 'white' : 'rgba(255,255,255,0.6)', fontWeight: 600, textAlign: 'center', padding: '0 4px' }}>
+                        {/* Badge Icon */}
+                        <div style={{
+                          fontSize: 32,
+                          textAlign: 'center',
+                          marginBottom: 8,
+                          filter: isUnlocked ? 'none' : 'grayscale(100%)'
+                        }}>
+                          {topic.emoji}
+                        </div>
+
+                        {/* Topic Name */}
+                        <div style={{
+                          fontSize: 11,
+                          fontWeight: 600,
+                          color: isCompleted ? 'white' : isUnlocked ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.4)',
+                          textAlign: 'center',
+                          lineHeight: 1.3
+                        }}>
                           {topic.name}
-                        </span>
-                        {completed && (
-                          <div style={{ position: 'absolute', top: -5, right: -5, width: 20, height: 20, borderRadius: '50%', background: 'linear-gradient(135deg, #2ECC71, #27AE60)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(46,204,113,0.5)', border: '2px solid #1a1a2e' }}>
-                            <span style={{ color: 'white', fontSize: 11, fontWeight: 700 }}>✓</span>
+                        </div>
+
+                        {/* Green Checkmark for Completed */}
+                        {isCompleted && (
+                          <div style={{
+                            position: 'absolute',
+                            top: -6,
+                            right: -6,
+                            width: 24,
+                            height: 24,
+                            borderRadius: '50%',
+                            background: 'linear-gradient(135deg, #2ECC71, #27AE60)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: '0 2px 8px rgba(46,204,113,0.5)',
+                            border: '2px solid white'
+                          }}>
+                            <span style={{ color: 'white', fontSize: 14, fontWeight: 700 }}>✓</span>
                           </div>
                         )}
-                        {!unlocked && (
-                          <div style={{ position: 'absolute', bottom: -3, right: -3, width: 18, height: 18, borderRadius: '50%', background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.2)' }}>
-                            <span style={{ fontSize: 9 }}>🔒</span>
+
+                        {/* Lock Icon for Locked */}
+                        {!isUnlocked && (
+                          <div style={{
+                            position: 'absolute',
+                            bottom: -4,
+                            right: -4,
+                            width: 20,
+                            height: 20,
+                            borderRadius: '50%',
+                            background: 'rgba(0,0,0,0.6)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            border: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            <span style={{ fontSize: 10 }}>🔒</span>
                           </div>
                         )}
                       </div>
@@ -506,419 +1025,917 @@ export default function MhaStoryApp() {
             );
           })}
 
-          {/* Dashboard Button */}
-          {completedCount > 0 && (
-            <button
-              onClick={() => setScreen('dashboard')}
-              style={{ ...styles.btn, ...styles.btnSecondary, marginTop: 16 }}
-            >
-              📊 Dashboard ({completedCount}/12)
-            </button>
-          )}
-        </div>
-
-        {/* Badge Modal */}
-        {showBadgeModal && selectedBadge && (
-          <div style={styles.modal} onClick={() => setShowBadgeModal(false)}>
-            <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 64, marginBottom: 16 }}>{selectedBadge.emoji}</div>
-                <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8, color: '#333' }}>{selectedBadge.name}</h2>
-                <p style={{ fontSize: 14, color: selectedBadge.color, marginBottom: 16 }}>{selectedBadge.dimensionEmoji} {selectedBadge.dimension}</p>
-                <p style={{ fontSize: 14, color: '#666', marginBottom: 20, lineHeight: 1.6 }}>{selectedBadge.shortDesc}</p>
-                
-                <div style={{ background: '#f5f5f5', borderRadius: 12, padding: 16, marginBottom: 20 }}>
-                  <p style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>🔬 Science Fact</p>
-                  <p style={{ fontSize: 13, color: '#333' }}>{selectedBadge.scienceFact}</p>
-                </div>
-
-                {isTopicCompleted(selectedBadge.id) ? (
-                  <button
-                    onClick={() => {
-                      setViewingResult(selectedBadge);
-                      setShowBadgeModal(false);
-                      setScreen('result');
-                    }}
-                    style={{ ...styles.btn, background: '#4ECDC4', color: 'white' }}
-                  >
-                    ดูผลลัพธ์ 📊
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => {
-                      setCurrentTopic(selectedBadge);
-                      setShowBadgeModal(false);
-                      setScreen('topic-intro');
-                    }}
-                    style={{ ...styles.btn, ...styles.btnPrimary }}
-                  >
-                    เริ่มทดสอบ 🚀
-                  </button>
-                )}
-              </div>
+          {/* What You'll Get */}
+          <div style={{
+            ...styles.darkCard,
+            background: 'linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,107,107,0.1))',
+            border: '1px solid rgba(255,215,0,0.2)',
+            marginBottom: 20
+          }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#FFD700', marginBottom: 14, textAlign: 'center' }}>
+              🎁 สิ่งที่คุณจะได้รับเมื่อทำครบ 12 Tests
             </div>
-          </div>
-        )}
-
-        {/* Dimension Popup */}
-        {showDimensionPopup && (
-          <div style={styles.modal} onClick={() => setShowDimensionPopup(false)}>
-            <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-              <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20, textAlign: 'center', color: '#333' }}>🧬 5 DNA Dimensions</h2>
-              {dimensionInfo.map((dim) => (
-                <div key={dim.name} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 16, padding: 12, background: `${dim.color}15`, borderRadius: 12, border: `1px solid ${dim.color}33` }}>
-                  <div style={{ fontSize: 28 }}>{dim.emoji}</div>
-                  <div>
-                    <div style={{ fontWeight: 700, color: dim.color, marginBottom: 4 }}>{dim.name}</div>
-                    <div style={{ fontSize: 11, color: '#666', marginBottom: 4 }}>{dim.gene}</div>
-                    <div style={{ fontSize: 12, color: '#555' }}>{dim.desc}</div>
-                  </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              {[
+                { emoji: '🧬', text: 'DNA Radar Chart 5 มิติ' },
+                { emoji: '🏆', text: 'Dog Archetype (1 ใน 8)' },
+                { emoji: '💡', text: 'คำแนะนำเฉพาะบุคคล' },
+                { emoji: '🎴', text: 'Share Card สวยๆ' },
+                { emoji: '❤️', text: 'Bond Match กับเจ้าของ' },
+                { emoji: '📊', text: 'Health Risk Flags' }
+              ].map((item, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ fontSize: 16 }}>{item.emoji}</span>
+                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.8)' }}>{item.text}</span>
                 </div>
               ))}
-              <button onClick={() => setShowDimensionPopup(false)} style={{ ...styles.btn, background: '#333', color: 'white', marginTop: 8 }}>
-                ปิด
-              </button>
             </div>
           </div>
-        )}
-      </div>
-    );
-  }
 
-  // TOPIC INTRO SCREEN
-  if (screen === 'topic-intro' && currentTopic) {
-    return (
-      <div style={styles.container}>
-        <div style={styles.content}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', textAlign: 'center' }}>
-            <div style={{ fontSize: 80, marginBottom: 24, filter: `drop-shadow(0 0 30px ${currentTopic.color}66)` }}>{currentTopic.emoji}</div>
-            <h1 style={{ fontSize: 28, fontWeight: 800, color: 'white', marginBottom: 8 }}>{currentTopic.name}</h1>
-            <p style={{ fontSize: 16, color: currentTopic.color, marginBottom: 24 }}>{currentTopic.shortDesc}</p>
-            
-            <div style={{ ...styles.card, marginBottom: 32, maxWidth: 320 }}>
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>🔬 Science Fact</p>
-              <p style={{ fontSize: 14, color: 'white', lineHeight: 1.6 }}>{currentTopic.scienceFact}</p>
-            </div>
+          {/* CTA */}
+          <button 
+            style={{ ...styles.btn, ...styles.btnPrimary, marginBottom: 12 }}
+            onClick={() => {
+              setCurrentTopic(allTopics[0]);
+              setScreen('topic-intro');
+            }}
+          >
+            🐾 เริ่มจาก Paw Sequence 1
+          </button>
 
-            <button
-              onClick={() => {
-                setAnswers([]);
-                setCurrentQuestion(0);
-                setScreen('quiz');
-              }}
-              style={{ ...styles.btn, ...styles.btnPrimary, maxWidth: 280 }}
-            >
-              เริ่มทดสอบ →
-            </button>
-
-            <button
-              onClick={() => setScreen('overview')}
-              style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.5)', marginTop: 16, cursor: 'pointer', fontSize: 14 }}
-            >
-              ← กลับ
-            </button>
+          <div style={{ textAlign: 'center', fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 20 }}>
+            ทำทีละ Test ก็ได้ • ไม่ต้องรีบ • ผลสะสมอัตโนมัติ
           </div>
         </div>
       </div>
     );
-  }
+  };
 
-  // QUIZ SCREEN
-  if (screen === 'quiz' && currentTopic) {
-    const question = quizQuestions[currentQuestion];
-    
-    return (
-      <div style={styles.container}>
-        <div style={styles.content}>
-          {/* Progress */}
-          <div style={{ marginBottom: 24 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-              <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13 }}>{currentTopic.emoji} {currentTopic.name}</span>
-              <span style={{ color: 'white', fontSize: 13, fontWeight: 600 }}>{currentQuestion + 1}/{quizQuestions.length}</span>
-            </div>
-            <div style={{ height: 6, background: 'rgba(255,255,255,0.1)', borderRadius: 3, overflow: 'hidden' }}>
-              <div style={{ width: `${((currentQuestion + 1) / quizQuestions.length) * 100}%`, height: '100%', background: `linear-gradient(90deg, ${currentTopic.color}, ${currentTopic.color}CC)`, borderRadius: 3, transition: 'width 0.3s ease' }} />
-            </div>
+  // Dimension Info Popup
+  const DimensionPopup = () => (
+    <div style={styles.modal} onClick={() => setShowDimensionPopup(false)}>
+      <div 
+        style={{ 
+          ...styles.card, 
+          maxWidth: 380, 
+          width: '100%',
+          maxHeight: '85vh',
+          overflowY: 'auto'
+        }} 
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+          <div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: '#333' }}>🧬 5 DNA Dimensions</div>
+            <div style={{ fontSize: 12, color: '#888' }}>ทำไมเราถึงแบ่งเป็น 5 มิติ?</div>
           </div>
+          <button 
+            onClick={() => setShowDimensionPopup(false)}
+            style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#999' }}
+          >×</button>
+        </div>
 
-          {/* Question Card */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
-            <div style={{ 
-              ...styles.card, 
-              width: '100%', 
-              textAlign: 'center',
-              transform: swipeDir === 'left' ? 'translateX(-100px) rotate(-10deg)' : swipeDir === 'right' ? 'translateX(100px) rotate(10deg)' : 'none',
-              opacity: swipeDir ? 0.5 : 1,
-              transition: 'all 0.3s ease'
-            }}>
-              <div style={{ fontSize: 64, marginBottom: 20 }}>{question?.emoji}</div>
-              <p style={{ fontSize: 18, color: 'white', lineHeight: 1.6, minHeight: 60 }}>{question?.q}</p>
-            </div>
+        {/* Intro */}
+        <div style={{
+          background: 'linear-gradient(135deg, #FFF5E6, #FFE8F0)',
+          borderRadius: 16,
+          padding: 16,
+          marginBottom: 20
+        }}>
+          <p style={{ fontSize: 13, color: '#555', lineHeight: 1.7, margin: 0 }}>
+            งานวิจัยด้านพันธุศาสตร์พฤติกรรมสุนัขพบว่า บุคลิกภาพของน้องหมาถูกควบคุมโดย <strong>5 กลุ่มยีนหลัก</strong> ที่ส่งผลต่อพฤติกรรมและอารมณ์อย่างชัดเจน
+          </p>
+        </div>
 
-            {/* Swipe Buttons */}
-            <div style={{ display: 'flex', gap: 40, marginTop: 40 }}>
-              <button
-                onClick={() => handleSwipe('left')}
-                style={{ width: 80, height: 80, borderRadius: '50%', background: 'linear-gradient(135deg, #636e72, #2d3436)', border: 'none', fontSize: 36, cursor: 'pointer', boxShadow: '0 8px 25px rgba(0,0,0,0.3)', transition: 'transform 0.2s' }}
-              >
-                😅
-              </button>
-              <button
-                onClick={() => handleSwipe('right')}
-                style={{ width: 80, height: 80, borderRadius: '50%', background: 'linear-gradient(135deg, #FF6B6B, #ee5a5a)', border: 'none', fontSize: 36, cursor: 'pointer', boxShadow: '0 8px 25px rgba(255,107,107,0.4)', transition: 'transform 0.2s' }}
-              >
-                😍
-              </button>
+        {/* Each Dimension */}
+        {dimensionInfo.map((dim, i) => (
+          <div key={dim.name} style={{
+            background: `${dim.color}11`,
+            border: `1px solid ${dim.color}33`,
+            borderRadius: 16,
+            padding: 16,
+            marginBottom: 12
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+              <div style={{
+                width: 44,
+                height: 44,
+                borderRadius: 12,
+                background: `linear-gradient(135deg, ${dim.color}, ${dim.color}CC)`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 22
+              }}>
+                {dim.emoji}
+              </div>
+              <div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: '#333' }}>{dim.name}</div>
+                <div style={{ fontSize: 10, color: dim.color, fontWeight: 600 }}>{dim.gene}</div>
+              </div>
             </div>
-            <div style={{ display: 'flex', gap: 60, marginTop: 12 }}>
-              <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>ไม่ใช่เลย</span>
-              <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>ใช่เลย!</span>
-            </div>
+            <p style={{ fontSize: 12, color: '#555', lineHeight: 1.6, margin: 0 }}>
+              {dim.desc}
+            </p>
+          </div>
+        ))}
+
+        {/* Source */}
+        <div style={{ 
+          fontSize: 10, 
+          color: '#999', 
+          textAlign: 'center',
+          padding: '12px 0',
+          borderTop: '1px solid #EEE'
+        }}>
+          📚 อ้างอิงจาก: Nagasawa et al. (2015), Hare & Tomasello (2005),<br/>
+          Raffan et al. (2016), และงานวิจัยอื่นๆ
+        </div>
+
+        <button
+          onClick={() => setShowDimensionPopup(false)}
+          style={{ ...styles.btn, background: '#333', color: 'white' }}
+        >
+          เข้าใจแล้ว! 👍
+        </button>
+      </div>
+    </div>
+  );
+
+  // Topic Intro Screen
+  const TopicIntroScreen = () => (
+    <div style={styles.container}>
+      <div style={{...styles.glowOrb, width: 300, height: 300, background: currentTopic.color, top: 50, right: -100}} />
+      
+      <div style={styles.content}>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
+          <button onClick={() => setScreen('overview')} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: 'white' }}>←</button>
+          <div style={{ flex: 1 }} />
+          <div style={{ padding: '6px 12px', background: 'rgba(255,255,255,0.1)', borderRadius: 20, fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>
+            🐾 Paw {currentTopic.island} • Test {currentTopic.id}
           </div>
         </div>
 
-        {/* Lead Gate Modal */}
-        {showLeadGate && (
-          <div style={styles.modal}>
-            <div style={styles.modalContent}>
-              {/* Progress Dots */}
-              <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginBottom: 24 }}>
-                {[0, 1, 2, 3].map((step) => (
-                  <div key={step} style={{ width: leadStep === step ? 24 : 8, height: 8, borderRadius: 4, background: leadStep >= step ? '#FF6B6B' : '#E8E8E8', transition: 'all 0.3s' }} />
+        <div style={{ textAlign: 'center', paddingTop: 20 }}>
+          <div style={{
+            width: 120, height: 120, borderRadius: 30,
+            background: `linear-gradient(135deg, ${currentTopic.color}33, ${currentTopic.color}11)`,
+            border: `3px solid ${currentTopic.color}`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 56, margin: '0 auto 24px',
+            boxShadow: `0 0 60px ${currentTopic.color}44`
+          }}>
+            {currentTopic.emoji}
+          </div>
+
+          <h1 style={{ fontSize: 32, fontWeight: 800, color: 'white', marginBottom: 8 }}>
+            {currentTopic.name}
+          </h1>
+
+          <div style={{
+            display: 'inline-block', padding: '8px 16px',
+            background: `${currentTopic.color}22`, borderRadius: 20,
+            fontSize: 14, color: currentTopic.color, fontWeight: 600, marginBottom: 24
+          }}>
+            {currentTopic.dimensionEmoji} {currentTopic.dimension} Dimension
+          </div>
+
+          <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.8)', lineHeight: 1.6, marginBottom: 24 }}>
+            {currentTopic.fullDesc}
+          </p>
+
+          {/* Science Fact */}
+          <div style={{ ...styles.darkCard, textAlign: 'left', marginBottom: 24 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <span style={{ fontSize: 20 }}>🔬</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: currentTopic.color }}>Science Fact</span>
+            </div>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.8)', lineHeight: 1.7, margin: 0 }}>
+              {currentTopic.scienceFact}
+            </p>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 12 }}>
+              📚 {currentTopic.reference}
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 24, margin: '24px 0', color: 'rgba(255,255,255,0.6)', fontSize: 14 }}>
+            <span>📝 {currentTopic.questions} คำถาม</span>
+            <span>⏱️ {currentTopic.duration}</span>
+          </div>
+
+          <button
+            onClick={() => { setCurrentQuestion(0); setAnswers([]); setScreen('quiz'); }}
+            style={{ ...styles.btn, ...styles.btnPrimary, fontSize: 18 }}
+          >
+            🧬 เริ่มค้นหา DNA บุคลิกภาพ
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Quiz Screen
+  const QuizScreen = () => (
+    <div style={styles.container}>
+      <div style={{...styles.glowOrb, width: 200, height: 200, background: currentTopic.color, top: 100, left: -80}} />
+      
+      <div style={styles.content}>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
+          <button onClick={() => setScreen('topic-intro')} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: 'white' }}>←</button>
+          <div style={{ flex: 1, textAlign: 'center' }}>
+            <span style={{ fontSize: 20 }}>{currentTopic.emoji}</span>
+            <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', marginLeft: 8 }}>{currentTopic.name}</span>
+          </div>
+          <span style={{ background: currentTopic.color, color: 'white', padding: '6px 14px', borderRadius: 20, fontSize: 14, fontWeight: 700 }}>
+            {currentQuestion + 1}/10
+          </span>
+        </div>
+
+        <div style={{ height: 6, background: 'rgba(255,255,255,0.1)', borderRadius: 3, marginBottom: 40, overflow: 'hidden' }}>
+          <div style={{
+            width: `${((currentQuestion + 1) / 10) * 100}%`,
+            height: '100%',
+            background: `linear-gradient(90deg, ${currentTopic.color}, #FFD93D)`,
+            borderRadius: 3, transition: 'width 0.5s ease',
+            boxShadow: `0 0 20px ${currentTopic.color}`
+          }} />
+        </div>
+
+        <div style={{
+          ...styles.card, textAlign: 'center',
+          transform: swipeDir === 'left' ? 'translateX(-100px) rotate(-10deg)' : 
+                     swipeDir === 'right' ? 'translateX(100px) rotate(10deg)' : 'none',
+          opacity: swipeDir ? 0.5 : 1, transition: 'all 0.3s ease'
+        }}>
+          <div style={{ fontSize: 56, marginBottom: 20 }}>{quizQuestions[currentQuestion].emoji}</div>
+          <h2 style={{ fontSize: 22, fontWeight: 700, color: '#333', lineHeight: 1.4, marginBottom: 40, minHeight: 60 }}>
+            {quizQuestions[currentQuestion].q}
+          </h2>
+
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 32, marginBottom: 20 }}>
+            <button onClick={() => handleSwipe('left')} style={{
+              width: 90, height: 90, borderRadius: '50%', border: 'none',
+              background: 'linear-gradient(135deg, #FFE4E4, #FFCCCC)',
+              fontSize: 40, cursor: 'pointer', boxShadow: '0 8px 25px rgba(255,107,107,0.3)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}>😅</button>
+            <button onClick={() => handleSwipe('right')} style={{
+              width: 90, height: 90, borderRadius: '50%', border: 'none',
+              background: 'linear-gradient(135deg, #E4FFE4, #CCFFCC)',
+              fontSize: 40, cursor: 'pointer', boxShadow: '0 8px 25px rgba(76,175,80,0.3)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}>😍</button>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: '#888', padding: '0 20px' }}>
+            <span>ไม่ใช่เลย</span>
+            <span>ใช่เลย!</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Lead Gate Modal
+  // Lead Gate Modal - Step by Step
+  const LeadGateModal = () => {
+    const goNextStep = () => {
+      if (leadStep < 3) {
+        setLeadStep(leadStep + 1);
+      } else {
+        submitLead();
+      }
+    };
+
+    const canProceed = () => {
+      switch(leadStep) {
+        case 0: return leadInfo.dogName.trim().length > 0;
+        case 1: return selectedBreed.length > 0;
+        case 2: return leadInfo.name.trim().length > 0;
+        case 3: return leadInfo.email && leadInfo.email.trim().length > 0 && leadInfo.email.includes('@');
+        default: return false;
+      }
+    };
+
+    const handleKeyPress = (e) => {
+      if (e.key === 'Enter' && canProceed()) {
+        goNextStep();
+      }
+    };
+
+    return (
+      <div style={styles.modal}>
+        <div style={{ ...styles.card, maxWidth: 380, width: '100%' }}>
+          {/* Progress Dots */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginBottom: 24 }}>
+            {[0, 1, 2, 3].map((step) => (
+              <div key={step} style={{
+                width: step === leadStep ? 24 : 8,
+                height: 8,
+                borderRadius: 4,
+                background: step <= leadStep ? 'linear-gradient(135deg, #FF6B6B, #FFD93D)' : '#E0E0E0',
+                transition: 'all 0.3s ease'
+              }} />
+            ))}
+          </div>
+
+          {/* Step 0: Dog Name */}
+          {leadStep === 0 && (
+            <div style={{ animation: 'fadeIn 0.3s ease' }}>
+              <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                <div style={{ fontSize: 56, marginBottom: 12 }}>🐕</div>
+                <h2 style={{ fontSize: 22, fontWeight: 800, color: '#333', marginBottom: 8 }}>
+                  น้องหมาชื่ออะไร?
+                </h2>
+                <p style={{ fontSize: 13, color: '#888' }}>
+                  บอกชื่อน้องเพื่อดูผล DNA ส่วนตัว
+                </p>
+              </div>
+
+              <input
+                type="text"
+                placeholder="พิมพ์ชื่อน้องหมา..."
+                value={leadInfo.dogName}
+                onChange={(e) => setLeadInfo({...leadInfo, dogName: e.target.value})}
+                onKeyPress={handleKeyPress}
+                
+                style={{
+                  ...styles.input,
+                  fontSize: 18,
+                  textAlign: 'center',
+                  marginBottom: 20
+                }}
+              />
+
+              <button 
+                onClick={goNextStep}
+                disabled={!canProceed()}
+                style={{ 
+                  ...styles.btn, 
+                  ...styles.btnPrimary,
+                  opacity: canProceed() ? 1 : 0.5,
+                  cursor: canProceed() ? 'pointer' : 'not-allowed'
+                }}
+              >
+                ถัดไป →
+              </button>
+            </div>
+          )}
+
+          {/* Step 1: Breed */}
+          {leadStep === 1 && (
+            <div style={{ animation: 'fadeIn 0.3s ease' }}>
+              <div style={{ textAlign: 'center', marginBottom: 20 }}>
+                <div style={{ fontSize: 56, marginBottom: 12 }}>🐾</div>
+                <h2 style={{ fontSize: 22, fontWeight: 800, color: '#333', marginBottom: 8 }}>
+                  {leadInfo.dogName} เป็นพันธุ์อะไร?
+                </h2>
+                <p style={{ fontSize: 13, color: '#888' }}>
+                  เลือกสายพันธุ์ที่ใกล้เคียงที่สุด
+                </p>
+              </div>
+
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(2, 1fr)', 
+                gap: 8,
+                maxHeight: 280,
+                overflowY: 'auto',
+                marginBottom: 20,
+                padding: 4
+              }}>
+                {dogBreeds.map((breed) => (
+                  <button
+                    key={breed}
+                    onClick={() => setSelectedBreed(breed)}
+                    style={{
+                      padding: '12px 10px',
+                      borderRadius: 12,
+                      border: selectedBreed === breed ? '2px solid #FF6B6B' : '2px solid #E8E8E8',
+                      background: selectedBreed === breed ? '#FFF0F0' : 'white',
+                      fontSize: 13,
+                      fontWeight: selectedBreed === breed ? 600 : 400,
+                      color: selectedBreed === breed ? '#FF6B6B' : '#555',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    {breed}
+                  </button>
                 ))}
               </div>
 
-              {/* Step 0: Dog Name */}
-              {leadStep === 0 && (
-                <div>
-                  <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                    <div style={{ fontSize: 56, marginBottom: 12 }}>🐕</div>
-                    <h2 style={{ fontSize: 22, fontWeight: 800, color: '#333', marginBottom: 8 }}>น้องหมาชื่ออะไร?</h2>
-                    <p style={{ fontSize: 13, color: '#888' }}>บอกชื่อน้องเพื่อดูผล DNA ส่วนตัว</p>
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="พิมพ์ชื่อน้องหมา..."
-                    value={leadInfo.dogName}
-                    onChange={(e) => setLeadInfo({...leadInfo, dogName: e.target.value})}
-                    style={{ ...styles.input, fontSize: 18, textAlign: 'center', marginBottom: 20 }}
-                  />
-                  <button 
-                    onClick={() => leadInfo.dogName.trim() && setLeadStep(1)}
-                    disabled={!leadInfo.dogName.trim()}
-                    style={{ ...styles.btn, ...styles.btnPrimary, opacity: leadInfo.dogName.trim() ? 1 : 0.5 }}
-                  >
-                    ถัดไป →
-                  </button>
-                </div>
-              )}
-
-              {/* Step 1: Breed */}
-              {leadStep === 1 && (
-                <div>
-                  <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                    <div style={{ fontSize: 56, marginBottom: 12 }}>🐾</div>
-                    <h2 style={{ fontSize: 22, fontWeight: 800, color: '#333', marginBottom: 8 }}>{leadInfo.dogName} เป็นพันธุ์อะไร?</h2>
-                    <p style={{ fontSize: 13, color: '#888' }}>เลือกสายพันธุ์ที่ใกล้เคียงที่สุด</p>
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, maxHeight: 280, overflowY: 'auto', marginBottom: 20, padding: 4 }}>
-                    {dogBreeds.map((breed) => (
-                      <button
-                        key={breed}
-                        onClick={() => setSelectedBreed(breed)}
-                        style={{ padding: '12px 10px', borderRadius: 12, border: selectedBreed === breed ? '2px solid #FF6B6B' : '2px solid #E8E8E8', background: selectedBreed === breed ? '#FFF0F0' : 'white', fontSize: 13, fontWeight: selectedBreed === breed ? 600 : 400, color: selectedBreed === breed ? '#FF6B6B' : '#555', cursor: 'pointer', transition: 'all 0.2s' }}
-                      >
-                        {breed}
-                      </button>
-                    ))}
-                  </div>
-                  <button 
-                    onClick={() => selectedBreed && setLeadStep(2)}
-                    disabled={!selectedBreed}
-                    style={{ ...styles.btn, ...styles.btnPrimary, opacity: selectedBreed ? 1 : 0.5 }}
-                  >
-                    ถัดไป →
-                  </button>
-                </div>
-              )}
-
-              {/* Step 2: Owner Name */}
-              {leadStep === 2 && (
-                <div>
-                  <div style={{ textAlign: 'center', marginBottom: 24 }}>
-                    <div style={{ fontSize: 56, marginBottom: 12 }}>👤</div>
-                    <h2 style={{ fontSize: 22, fontWeight: 800, color: '#333', marginBottom: 8 }}>คุณชื่ออะไร?</h2>
-                    <p style={{ fontSize: 13, color: '#888' }}>พ่อ/แม่ของ {leadInfo.dogName} ({selectedBreed})</p>
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="พิมพ์ชื่อคุณ..."
-                    value={leadInfo.name}
-                    onChange={(e) => setLeadInfo({...leadInfo, name: e.target.value})}
-                    style={{ ...styles.input, fontSize: 18, textAlign: 'center', marginBottom: 20 }}
-                  />
-                  <button 
-                    onClick={() => leadInfo.name.trim() && setLeadStep(3)}
-                    disabled={!leadInfo.name.trim()}
-                    style={{ ...styles.btn, ...styles.btnPrimary, opacity: leadInfo.name.trim() ? 1 : 0.5 }}
-                  >
-                    ถัดไป →
-                  </button>
-                </div>
-              )}
-
-              {/* Step 3: Contact */}
-              {leadStep === 3 && (
-                <div>
-                  <div style={{ textAlign: 'center', marginBottom: 24 }}>
-                    <div style={{ fontSize: 56, marginBottom: 12 }}>📧</div>
-                    <h2 style={{ fontSize: 22, fontWeight: 800, color: '#333', marginBottom: 8 }}>ส่งผล DNA ไปที่ไหนดี?</h2>
-                    <p style={{ fontSize: 13, color: '#888' }}>เพื่อรับผลวิเคราะห์ของ {leadInfo.dogName}</p>
-                  </div>
-                  <div style={{ marginBottom: 16 }}>
-                    <label style={{ fontSize: 12, fontWeight: 600, color: '#555', marginBottom: 6, display: 'block' }}>
-                      Email <span style={{ color: '#FF6B6B' }}>*</span>
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="example@email.com"
-                      value={leadInfo.email}
-                      onChange={(e) => setLeadInfo({...leadInfo, email: e.target.value})}
-                      style={{ ...styles.input, fontSize: 16, textAlign: 'center' }}
-                    />
-                  </div>
-                  <div style={{ marginBottom: 20 }}>
-                    <label style={{ fontSize: 12, fontWeight: 600, color: '#555', marginBottom: 6, display: 'block' }}>
-                      เบอร์โทรศัพท์ <span style={{ color: '#999', fontWeight: 400 }}>(ไม่บังคับ)</span>
-                    </label>
-                    <input
-                      type="tel"
-                      placeholder="08X-XXX-XXXX"
-                      value={leadInfo.contact}
-                      onChange={(e) => setLeadInfo({...leadInfo, contact: e.target.value})}
-                      style={{ ...styles.input, fontSize: 16, textAlign: 'center' }}
-                    />
-                    <div style={{ fontSize: 11, color: '#999', marginTop: 6, textAlign: 'center' }}>
-                      💬 เพื่อรับ tips ดูแลน้องหมาผ่าน LINE
-                    </div>
-                  </div>
-                  <button 
-                    onClick={submitLead}
-                    disabled={!leadInfo.email.includes('@')}
-                    style={{ ...styles.btn, ...styles.btnPrimary, opacity: leadInfo.email.includes('@') ? 1 : 0.5 }}
-                  >
-                    🎉 ดูผลลัพธ์
-                  </button>
-                </div>
-              )}
-
-              {/* Back Button */}
-              {leadStep > 0 && (
-                <button
-                  onClick={() => setLeadStep(leadStep - 1)}
-                  style={{ background: 'transparent', border: 'none', color: '#888', marginTop: 16, cursor: 'pointer', fontSize: 14, width: '100%' }}
-                >
-                  ← ย้อนกลับ
-                </button>
-              )}
+              <button 
+                onClick={goNextStep}
+                disabled={!canProceed()}
+                style={{ 
+                  ...styles.btn, 
+                  ...styles.btnPrimary,
+                  opacity: canProceed() ? 1 : 0.5,
+                  cursor: canProceed() ? 'pointer' : 'not-allowed'
+                }}
+              >
+                ถัดไป →
+              </button>
             </div>
-          </div>
-        )}
+          )}
+
+          {/* Step 2: Owner Name */}
+          {leadStep === 2 && (
+            <div style={{ animation: 'fadeIn 0.3s ease' }}>
+              <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                <div style={{ fontSize: 56, marginBottom: 12 }}>👤</div>
+                <h2 style={{ fontSize: 22, fontWeight: 800, color: '#333', marginBottom: 8 }}>
+                  คุณชื่ออะไร?
+                </h2>
+                <p style={{ fontSize: 13, color: '#888' }}>
+                  พ่อ/แม่ของ {leadInfo.dogName} ({selectedBreed})
+                </p>
+              </div>
+
+              <input
+                type="text"
+                placeholder="พิมพ์ชื่อคุณ..."
+                value={leadInfo.name}
+                onChange={(e) => setLeadInfo({...leadInfo, name: e.target.value})}
+                onKeyPress={handleKeyPress}
+                
+                style={{
+                  ...styles.input,
+                  fontSize: 18,
+                  textAlign: 'center',
+                  marginBottom: 20
+                }}
+              />
+
+              <button 
+                onClick={goNextStep}
+                disabled={!canProceed()}
+                style={{ 
+                  ...styles.btn, 
+                  ...styles.btnPrimary,
+                  opacity: canProceed() ? 1 : 0.5,
+                  cursor: canProceed() ? 'pointer' : 'not-allowed'
+                }}
+              >
+                ถัดไป →
+              </button>
+            </div>
+          )}
+
+          {/* Step 3: Phone */}
+          {leadStep === 3 && (
+            <div style={{ animation: 'fadeIn 0.3s ease' }}>
+              <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                <div style={{ fontSize: 56, marginBottom: 12 }}>📧</div>
+                <h2 style={{ fontSize: 22, fontWeight: 800, color: '#333', marginBottom: 8 }}>
+                  ส่งผล DNA ไปที่ไหนดี?
+                </h2>
+                <p style={{ fontSize: 13, color: '#888' }}>
+                  เพื่อรับผลวิเคราะห์ของ {leadInfo.dogName}
+                </p>
+              </div>
+
+              {/* Email (Required) */}
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: '#555', marginBottom: 6, display: 'block' }}>
+                  Email <span style={{ color: '#FF6B6B' }}>*</span>
+                </label>
+                <input
+                  type="email"
+                  placeholder="example@email.com"
+                  value={leadInfo.email || ''}
+                  onChange={(e) => setLeadInfo({...leadInfo, email: e.target.value})}
+                  onKeyPress={handleKeyPress}
+                  
+                  style={{
+                    ...styles.input,
+                    fontSize: 16,
+                    textAlign: 'center'
+                  }}
+                />
+              </div>
+
+              {/* Phone (Optional) */}
+              <div style={{ marginBottom: 20 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: '#555', marginBottom: 6, display: 'block' }}>
+                  เบอร์โทรศัพท์ <span style={{ color: '#999', fontWeight: 400 }}>(ไม่บังคับ)</span>
+                </label>
+                <input
+                  type="tel"
+                  placeholder="08X-XXX-XXXX"
+                  value={leadInfo.contact}
+                  onChange={(e) => setLeadInfo({...leadInfo, contact: e.target.value})}
+                  style={{
+                    ...styles.input,
+                    fontSize: 16,
+                    textAlign: 'center'
+                  }}
+                />
+                <div style={{ fontSize: 11, color: '#999', marginTop: 6, textAlign: 'center' }}>
+                  💬 เพื่อรับ tips ดูแลน้องหมาผ่าน LINE
+                </div>
+              </div>
+
+              {/* Preview Card */}
+              <div style={{
+                background: 'linear-gradient(135deg, #FFF5F5, #FFF0E6)',
+                borderRadius: 16,
+                padding: 16,
+                marginBottom: 20,
+                textAlign: 'center'
+              }}>
+                <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>พร้อมดูผลของ</div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: '#333' }}>
+                  🐕 {leadInfo.dogName}
+                </div>
+                <div style={{ fontSize: 12, color: '#888' }}>
+                  {selectedBreed} • เจ้าของ: {leadInfo.name}
+                </div>
+              </div>
+
+              <button 
+                onClick={goNextStep}
+                disabled={!canProceed()}
+                style={{ 
+                  ...styles.btn, 
+                  ...styles.btnPrimary,
+                  fontSize: 18,
+                  opacity: canProceed() ? 1 : 0.5,
+                  cursor: canProceed() ? 'pointer' : 'not-allowed'
+                }}
+              >
+                🧬 ดูผล DNA บุคลิกภาพ!
+              </button>
+
+              <div style={{ textAlign: 'center', marginTop: 16, fontSize: 11, color: '#999' }}>
+                🔒 ข้อมูลปลอดภัย ไม่แชร์กับบุคคลที่ 3
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     );
-  }
+  };
 
-  // RESULT SCREEN
-  if (screen === 'result') {
-    const topicToShow = viewingResult || currentTopic;
-    const score = viewingResult ? completedTopics[viewingResult.id]?.score : getScore();
-    const personality = getPersonality(topicToShow.id, score);
+  // Badge Preview Modal
+  const BadgePreviewModal = () => {
+    const topic = selectedBadge;
+    const isCompleted = isTopicCompleted(topic.id);
+    const isUnlocked = isTopicUnlocked(topic.id);
+    const result = completedTopics[topic.id];
 
     return (
-      <div style={styles.container}>
-        <div style={styles.content}>
+      <div style={styles.modal} onClick={() => setShowBadgeModal(false)}>
+        <div style={{ ...styles.card, maxWidth: 380, width: '100%' }} onClick={(e) => e.stopPropagation()}>
           {/* Header */}
-          <div style={{ textAlign: 'center', marginBottom: 24 }}>
-            <div style={{ fontSize: 64, marginBottom: 16, filter: `drop-shadow(0 0 30px ${topicToShow.color}66)` }}>{topicToShow.emoji}</div>
-            <h1 style={{ fontSize: 26, fontWeight: 800, color: 'white', marginBottom: 8 }}>{leadInfo.dogName || 'น้องหมา'}</h1>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)' }}>{topicToShow.name} Result</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+            <div style={{
+              width: 70, height: 70, borderRadius: 20,
+              background: isCompleted ? `linear-gradient(135deg, ${topic.color}, ${topic.color}CC)` : 
+                         isUnlocked ? `${topic.color}22` : '#F0F0F0',
+              border: `3px solid ${isCompleted ? topic.color : isUnlocked ? topic.color : '#E0E0E0'}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32,
+              boxShadow: isCompleted ? `0 8px 25px ${topic.color}44` : 'none'
+            }}>
+              {isCompleted ? '✓' : isUnlocked ? topic.emoji : '🔒'}
+            </div>
+            <button onClick={() => setShowBadgeModal(false)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#999' }}>×</button>
           </div>
 
-          {/* Score Circle */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
-            <div style={{ width: 140, height: 140, borderRadius: '50%', background: `conic-gradient(${topicToShow.color} ${score * 3.6}deg, rgba(255,255,255,0.1) 0deg)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <div style={{ width: 110, height: 110, borderRadius: '50%', background: '#1a1a2e', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontSize: 36, fontWeight: 800, color: 'white' }}>{score}%</span>
-                <span style={{ fontSize: 12, color: topicToShow.color }}>{topicToShow.dimension}</span>
+          {/* Topic Info */}
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <span style={{ fontSize: 24 }}>{topic.emoji}</span>
+              <h2 style={{ fontSize: 22, fontWeight: 700, color: '#333', margin: 0 }}>{topic.name}</h2>
+            </div>
+            <div style={{
+              display: 'inline-block', padding: '4px 12px',
+              background: `${topic.color}22`, borderRadius: 12,
+              fontSize: 12, color: topic.color, fontWeight: 600
+            }}>
+              {topic.dimensionEmoji} {topic.dimension} Dimension
+            </div>
+          </div>
+
+          {/* Description */}
+          <p style={{ fontSize: 14, color: '#666', lineHeight: 1.6, marginBottom: 20 }}>
+            {topic.fullDesc}
+          </p>
+
+          {/* Science Fact */}
+          <div style={{ background: '#F8F9FA', borderRadius: 16, padding: 16, marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <span>🔬</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: topic.color }}>Science Fact</span>
+            </div>
+            <p style={{ fontSize: 13, color: '#666', lineHeight: 1.6, margin: 0 }}>{topic.scienceFact}</p>
+            <div style={{ fontSize: 10, color: '#999', marginTop: 8 }}>📚 {topic.reference}</div>
+          </div>
+
+          {/* Stats */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginBottom: 20, color: '#888', fontSize: 13 }}>
+            <span>📝 {topic.questions} คำถาม</span>
+            <span>⏱️ {topic.duration}</span>
+          </div>
+
+          {/* Result (if completed) */}
+          {isCompleted && result && (
+            <div style={{
+              background: `linear-gradient(135deg, ${topic.color}11, ${topic.color}22)`,
+              borderRadius: 16, padding: 16, marginBottom: 20,
+              border: `2px solid ${topic.color}44`
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ fontSize: 12, color: '#888' }}>คะแนนของคุณ</div>
+                  <div style={{ fontSize: 28, fontWeight: 800, color: topic.color }}>{result.score}%</div>
+                </div>
+                <div style={{ fontSize: 40 }}>{getPersonality(result.score, topic.id).emoji}</div>
+              </div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#333', marginTop: 8 }}>
+                {getPersonality(result.score, topic.id).type}
+              </div>
+            </div>
+          )}
+
+          {/* Action Button */}
+          {isCompleted ? (
+            <button
+              onClick={() => {
+                setViewingResult(topic);
+                setShowBadgeModal(false);
+                setScreen('result');
+                setRevealStep(5);
+              }}
+              style={{ ...styles.btn, background: topic.color, color: 'white' }}
+            >
+              📊 ดูผลลัพธ์เต็ม
+            </button>
+          ) : isUnlocked ? (
+            <button
+              onClick={() => {
+                setCurrentTopic(topic);
+                setShowBadgeModal(false);
+                setScreen('topic-intro');
+              }}
+              style={{ ...styles.btn, ...styles.btnPrimary }}
+            >
+              🚀 เริ่มทำ Quiz
+            </button>
+          ) : (
+            <button style={{ ...styles.btn, background: '#E0E0E0', color: '#999', cursor: 'not-allowed' }}>
+              🔒 ทำ Topic ก่อนหน้าให้ครบก่อน
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // Result Screen
+  const ResultScreen = () => {
+    const topicToShow = viewingResult || currentTopic;
+    const score = viewingResult ? completedTopics[viewingResult.id]?.score : getScore();
+    const personality = getPersonality(score, topicToShow.id);
+    const dogName = leadInfo.dogName || 'น้องหมา';
+
+    return (
+      <div style={{...styles.container, background: 'linear-gradient(180deg, #0f0f23 0%, #1a1a3e 100%)'}}>
+        <div style={{...styles.glowOrb, width: 400, height: 400, background: topicToShow.color, top: -100, left: '50%', transform: 'translateX(-50%)'}} />
+        
+        <div style={styles.content}>
+          {/* Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+            <button onClick={() => { setViewingResult(null); setScreen('dashboard'); }} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: 'white' }}>←</button>
+            <button style={{
+              background: 'linear-gradient(135deg, #FF6B6B, #FF8E53)',
+              color: 'white', border: 'none', padding: '10px 20px', borderRadius: 20,
+              fontSize: 14, fontWeight: 600, cursor: 'pointer'
+            }}>📤 แชร์ผล</button>
+          </div>
+
+          {/* Topic Badge */}
+          <div style={{ textAlign: 'center', marginBottom: 16 }}>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              padding: '8px 16px', background: `${topicToShow.color}22`,
+              borderRadius: 20, border: `2px solid ${topicToShow.color}`
+            }}>
+              <span style={{ fontSize: 20 }}>{topicToShow.emoji}</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: topicToShow.color }}>{topicToShow.name}</span>
+            </div>
+          </div>
+
+          {/* Personality Reveal */}
+          <div style={{ textAlign: 'center', marginBottom: 24 }}>
+            <div style={{ opacity: revealStep >= 1 ? 1 : 0, transform: revealStep >= 1 ? 'scale(1)' : 'scale(0.5)', transition: 'all 0.8s ease' }}>
+              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>{dogName} คือ...</div>
+              <div style={{ fontSize: 80, marginBottom: 8, filter: 'drop-shadow(0 0 30px rgba(255,215,0,0.5))' }}>{personality.emoji}</div>
+              <h1 style={{ fontSize: 36, fontWeight: 800, background: 'linear-gradient(135deg, #FFD700, #FF6B6B)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: 8 }}>
+                {personality.type}
+              </h1>
+              <div style={{ fontSize: 16, color: 'rgba(255,255,255,0.8)', fontStyle: 'italic' }}>"{personality.tagline}"</div>
+            </div>
+          </div>
+
+          {/* Score Ring */}
+          <div style={{ opacity: revealStep >= 2 ? 1 : 0, transform: revealStep >= 2 ? 'translateY(0)' : 'translateY(20px)', transition: 'all 0.8s ease' }}>
+            <div style={{ ...styles.darkCard, display: 'flex', alignItems: 'center', gap: 20, marginBottom: 16 }}>
+              <div style={{
+                width: 80, height: 80, borderRadius: '50%',
+                background: `conic-gradient(${topicToShow.color} ${score}%, rgba(255,255,255,0.1) ${score}%)`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: `0 0 30px ${topicToShow.color}44`
+              }}>
+                <div style={{ width: 60, height: 60, borderRadius: '50%', background: '#1a1a3e', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ fontSize: 20, fontWeight: 800, color: 'white' }}>{score}%</div>
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>{topicToShow.dimensionEmoji} {topicToShow.dimension}</div>
+                <div style={{ fontSize: 16, fontWeight: 600, color: 'white' }}>Oxytocin: {personality.oxytocin}%</div>
+                <div style={{ fontSize: 12, color: topicToShow.color, marginTop: 4 }}>⭐ {personality.rarity}</div>
               </div>
             </div>
           </div>
 
-          {/* Personality */}
-          <div style={{ ...styles.card, textAlign: 'center', marginBottom: 24, border: `2px solid ${topicToShow.color}66` }}>
-            <h2 style={{ fontSize: 22, fontWeight: 700, color: topicToShow.color, marginBottom: 8 }}>{personality}</h2>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6 }}>
-              {score >= 80 && `${leadInfo.dogName || 'น้องหมา'} มีคะแนน ${topicToShow.name} สูงมาก! นี่คือลักษณะพิเศษที่หายาก`}
-              {score >= 60 && score < 80 && `${leadInfo.dogName || 'น้องหมา'} มีความสมดุลที่ดีในด้าน ${topicToShow.name}`}
-              {score >= 40 && score < 60 && `${leadInfo.dogName || 'น้องหมา'} มีคุณลักษณะที่น่าสนใจใน ${topicToShow.name}`}
-              {score < 40 && `${leadInfo.dogName || 'น้องหมา'} มีบุคลิกภาพที่เป็นเอกลักษณ์ใน ${topicToShow.name}`}
-            </p>
+          {/* Description */}
+          <div style={{ opacity: revealStep >= 3 ? 1 : 0, transform: revealStep >= 3 ? 'translateY(0)' : 'translateY(20px)', transition: 'all 0.8s ease' }}>
+            <div style={{ ...styles.darkCard, marginBottom: 16 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: topicToShow.color, marginBottom: 12 }}>🧬 DNA Analysis</div>
+              <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.85)', lineHeight: 1.8, margin: 0 }}>{personality.description}</p>
+            </div>
           </div>
 
-          {/* Science Insight */}
-          <div style={{ ...styles.card, marginBottom: 24 }}>
-            <h3 style={{ color: topicToShow.color, fontWeight: 600, marginBottom: 8 }}>🔬 Science Insight</h3>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6 }}>{topicToShow.scienceFact}</p>
+          {/* Traits */}
+          <div style={{ opacity: revealStep >= 4 ? 1 : 0, transform: revealStep >= 4 ? 'translateY(0)' : 'translateY(20px)', transition: 'all 0.8s ease' }}>
+            <div style={{ ...styles.darkCard, marginBottom: 16 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#4ECDC4', marginBottom: 12 }}>✨ บุคลิกภาพเด่น</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {personality.traits.map((trait, i) => (
+                  <span key={i} style={{
+                    padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+                    background: 'rgba(78,205,196,0.15)', color: '#4ECDC4', border: '1px solid rgba(78,205,196,0.3)'
+                  }}>{trait}</span>
+                ))}
+              </div>
+            </div>
           </div>
 
-          {/* Actions */}
-          <div style={{ display: 'flex', gap: 12 }}>
-            <button
-              onClick={() => {
-                setViewingResult(null);
-                setScreen('overview');
-              }}
-              style={{ ...styles.btn, ...styles.btnSecondary, flex: 1 }}
-            >
-              ทำ Test อื่น
-            </button>
-            <button
-              onClick={() => {
-                setViewingResult(null);
-                setScreen('dashboard');
-              }}
-              style={{ ...styles.btn, ...styles.btnPrimary, flex: 1 }}
-            >
-              📊 Dashboard
+          {/* NEW: Story Insight */}
+          <div style={{ opacity: revealStep >= 5 ? 1 : 0, transform: revealStep >= 5 ? 'translateY(0)' : 'translateY(20px)', transition: 'all 0.8s ease' }}>
+            {personality.storyInsight && (
+              <div style={{ ...styles.darkCard, marginBottom: 16, background: 'linear-gradient(135deg, rgba(155,89,182,0.15), rgba(142,68,173,0.1))', border: '1px solid rgba(155,89,182,0.3)' }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: '#9B59B6', marginBottom: 12 }}>🎭 Story Insight</div>
+                <div style={{ fontSize: 15, fontWeight: 600, color: 'white', marginBottom: 10 }}>{personality.storyInsight.title}</div>
+                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', lineHeight: 1.8, margin: 0 }}>{personality.storyInsight.content}</p>
+              </div>
+            )}
+
+            {/* NEW: Science Secret */}
+            {personality.scienceSecret && (
+              <div style={{ ...styles.darkCard, marginBottom: 16, background: 'linear-gradient(135deg, rgba(52,152,219,0.15), rgba(41,128,185,0.1))', border: '1px solid rgba(52,152,219,0.3)' }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: '#3498DB', marginBottom: 12 }}>🔬 Science Secret</div>
+                <div style={{ fontSize: 15, fontWeight: 600, color: 'white', marginBottom: 6 }}>{personality.scienceSecret.title}</div>
+                <div style={{ fontSize: 11, color: '#3498DB', marginBottom: 12, fontFamily: 'monospace' }}>Gene: {personality.scienceSecret.gene}</div>
+                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', lineHeight: 1.8, margin: 0 }}>{personality.scienceSecret.content}</p>
+                <div style={{ marginTop: 16, padding: 12, background: 'rgba(52,152,219,0.2)', borderRadius: 12 }}>
+                  <p style={{ fontSize: 12, color: '#3498DB', margin: 0, lineHeight: 1.6 }}>{personality.scienceSecret.funFact}</p>
+                </div>
+              </div>
+            )}
+
+            {/* NEW: How-To Guide */}
+            {personality.howToGuide && (
+              <div style={{ ...styles.darkCard, marginBottom: 16, background: 'linear-gradient(135deg, rgba(46,204,113,0.15), rgba(39,174,96,0.1))', border: '1px solid rgba(46,204,113,0.3)' }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: '#2ECC71', marginBottom: 16 }}>💡 {personality.howToGuide.title}</div>
+                {personality.howToGuide.tips.map((tip, i) => (
+                  <div key={i} style={{ 
+                    display: 'flex', 
+                    gap: 12, 
+                    marginBottom: i < personality.howToGuide.tips.length - 1 ? 16 : 0,
+                    paddingBottom: i < personality.howToGuide.tips.length - 1 ? 16 : 0,
+                    borderBottom: i < personality.howToGuide.tips.length - 1 ? '1px solid rgba(46,204,113,0.2)' : 'none'
+                  }}>
+                    <div style={{
+                      width: 40, height: 40, borderRadius: 12, flexShrink: 0,
+                      background: 'rgba(46,204,113,0.2)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 18
+                    }}>{tip.icon}</div>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: 'white', marginBottom: 4 }}>{tip.title}</div>
+                      <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6 }}>{tip.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* NEW: Warnings */}
+            {personality.warnings && (
+              <div style={{ ...styles.darkCard, marginBottom: 16, background: 'linear-gradient(135deg, rgba(231,76,60,0.15), rgba(192,57,43,0.1))', border: '1px solid rgba(231,76,60,0.3)' }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: '#E74C3C', marginBottom: 12 }}>⚠️ {personality.warnings.title}</div>
+                {personality.warnings.items.map((item, i) => (
+                  <div key={i} style={{ 
+                    display: 'flex', 
+                    alignItems: 'flex-start', 
+                    gap: 10, 
+                    marginBottom: i < personality.warnings.items.length - 1 ? 10 : 0 
+                  }}>
+                    <span style={{ color: '#E74C3C', fontSize: 12 }}>•</span>
+                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)', lineHeight: 1.5 }}>{item}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* NEW: Recommended Activities */}
+            {personality.activities && (
+              <div style={{ ...styles.darkCard, marginBottom: 16, background: 'linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,193,7,0.1))', border: '1px solid rgba(255,215,0,0.3)' }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: '#FFD700', marginBottom: 16 }}>🎯 {personality.activities.title}</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  {personality.activities.items.map((item, i) => (
+                    <div key={i} style={{
+                      background: 'rgba(255,215,0,0.1)',
+                      borderRadius: 12,
+                      padding: 12,
+                      textAlign: 'center'
+                    }}>
+                      <div style={{ fontSize: 24, marginBottom: 6 }}>{item.emoji}</div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: 'white', marginBottom: 4 }}>{item.name}</div>
+                      <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', lineHeight: 1.4 }}>{item.desc}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* CTA */}
+            <div style={{ ...styles.darkCard, textAlign: 'center', marginBottom: 16 }}>
+              <div style={{ fontSize: 32, marginBottom: 12 }}>🐾</div>
+              <div style={{ fontSize: 16, fontWeight: 600, color: 'white', marginBottom: 8 }}>
+                นี่แค่ 1 ใน 12 Tests!
+              </div>
+              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', marginBottom: 16 }}>
+                ค้นพบ DNA เพิ่มเติมใน 4 Paw Sequences
+              </div>
+              <button onClick={() => { setViewingResult(null); setScreen('dashboard'); }} style={{ ...styles.btn, ...styles.btnPrimary }}>
+                🧬 ทำ Test ต่อ
+              </button>
+            </div>
+
+            {/* Share Button */}
+            <button style={{ ...styles.btn, ...styles.btnGhost, marginBottom: 24 }}>
+              📤 แชร์ผลให้เพื่อน
             </button>
           </div>
         </div>
       </div>
     );
-  }
+  };
 
-  // DASHBOARD SCREEN
-  if (screen === 'dashboard') {
+  // Dashboard Screen with Clickable Badges
+  const DashboardScreen = () => {
     const completedCount = Object.keys(completedTopics).length;
 
     return (
       <div style={styles.container}>
+        <div style={{...styles.glowOrb, width: 300, height: 300, background: '#FF6B6B', top: -100, right: -100}} />
+        
         <div style={styles.content}>
-          {/* Header */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-            <button onClick={() => setScreen('overview')} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 10, padding: 10, cursor: 'pointer' }}>
-              <span style={{ color: 'white', fontSize: 18 }}>←</span>
-            </button>
-            <div>
-              <h1 style={{ fontSize: 22, fontWeight: 700, color: 'white' }}>📊 Dashboard</h1>
-              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>{leadInfo.dogName || 'น้องหมา'} • {completedCount}/12 Tests</p>
+          {/* Header with Back */}
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
+            <button onClick={() => setScreen('landing')} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: 'white' }}>←</button>
+            <div style={{ flex: 1, textAlign: 'center' }}>
+              <span style={{ fontSize: 14, letterSpacing: 3, color: 'rgba(255,255,255,0.5)' }}>🐾 MHA' STORY</span>
+            </div>
+            <div style={{ width: 24 }} />
+          </div>
+
+          {/* Profile Header */}
+          <div style={{ textAlign: 'center', marginBottom: 24 }}>
+            <div style={{ fontSize: 48, marginBottom: 12 }}>🐕</div>
+            <h2 style={{ fontSize: 24, fontWeight: 700, color: 'white', marginBottom: 4 }}>
+              {leadInfo.dogName || 'น้องหมา'}'s DNA Profile
+            </h2>
+            <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14 }}>
+              Level {Math.floor(completedCount / 3) + 1} ⭐ • {completedCount}/12 Tests
             </div>
           </div>
 
-          {/* Progress */}
-          <div style={{ marginBottom: 24 }}>
+          {/* Progress Bar */}
+          <div style={{ marginBottom: 32 }}>
             <div style={{ height: 10, background: 'rgba(255,255,255,0.1)', borderRadius: 5, overflow: 'hidden' }}>
-              <div style={{ width: `${(completedCount / 12) * 100}%`, height: '100%', background: 'linear-gradient(90deg, #FF6B6B, #FFD93D, #4ECDC4)', borderRadius: 5, transition: 'width 0.5s ease' }} />
+              <div style={{
+                width: `${(completedCount / 12) * 100}%`,
+                height: '100%',
+                background: 'linear-gradient(90deg, #FF6B6B, #FFD93D, #4ECDC4)',
+                borderRadius: 5,
+                transition: 'width 0.5s ease'
+              }} />
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>
               <span>0%</span>
@@ -927,48 +1944,155 @@ export default function MhaStoryApp() {
             </div>
           </div>
 
-          {/* Completed Tests */}
-          <h2 style={{ fontSize: 16, fontWeight: 600, color: 'white', marginBottom: 16 }}>✅ ผลลัพธ์ของคุณ</h2>
-          
-          {completedCount === 0 ? (
-            <div style={{ ...styles.card, textAlign: 'center' }}>
-              <p style={{ color: 'rgba(255,255,255,0.6)' }}>ยังไม่มีผลลัพธ์ ไปทำ Test กันเถอะ!</p>
+          {/* Badges Grid - Clickable */}
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: 'white', marginBottom: 16 }}>
+              🏆 DNA Badges
             </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
-              {Object.entries(completedTopics).map(([topicId, data]) => {
-                const topic = allTopics.find(t => t.id === parseInt(topicId));
-                const personality = getPersonality(parseInt(topicId), data.score);
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+              {allTopics.map((topic) => {
+                const isCompleted = isTopicCompleted(topic.id);
+                const isUnlocked = isTopicUnlocked(topic.id);
+                
                 return (
                   <div
-                    key={topicId}
-                    onClick={() => {
-                      setViewingResult(topic);
-                      setScreen('result');
+                    key={topic.id}
+                    onClick={() => { setSelectedBadge(topic); setShowBadgeModal(true); }}
+                    style={{
+                      ...styles.badge,
+                      width: '100%',
+                      height: 70,
+                      flexDirection: 'column',
+                      gap: 4,
+                      background: isCompleted 
+                        ? `linear-gradient(135deg, ${topic.color}, ${topic.color}CC)` 
+                        : isUnlocked 
+                          ? `${topic.color}22` 
+                          : 'rgba(255,255,255,0.05)',
+                      border: `2px solid ${isCompleted ? topic.color : isUnlocked ? `${topic.color}66` : 'rgba(255,255,255,0.1)'}`,
+                      boxShadow: isCompleted ? `0 4px 15px ${topic.color}44` : 'none',
+                      opacity: isUnlocked ? 1 : 0.5
                     }}
-                    style={{ ...styles.card, display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', border: `1px solid ${topic.color}44` }}
                   >
-                    <div style={{ fontSize: 32, width: 50, height: 50, borderRadius: 12, background: `${topic.color}33`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {/* Badge Emoji */}
+                    <span style={{ 
+                      fontSize: 22,
+                      filter: isUnlocked ? 'none' : 'grayscale(100%)'
+                    }}>
                       {topic.emoji}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <h3 style={{ fontSize: 14, fontWeight: 600, color: 'white', marginBottom: 4 }}>{topic.name}</h3>
-                      <p style={{ fontSize: 12, color: topic.color }}>{personality}</p>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: 20, fontWeight: 700, color: 'white' }}>{data.score}%</div>
-                      <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)' }}>{topic.dimension}</div>
-                    </div>
+                    </span>
+                    
+                    {/* Topic Number */}
+                    <span style={{ 
+                      fontSize: 9, 
+                      color: isCompleted ? 'white' : 'rgba(255,255,255,0.5)',
+                      fontWeight: 600
+                    }}>
+                      Test {topic.id}
+                    </span>
+
+                    {/* Green Checkmark for Completed */}
+                    {isCompleted && (
+                      <div style={{
+                        position: 'absolute',
+                        top: -5,
+                        right: -5,
+                        width: 20,
+                        height: 20,
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #2ECC71, #27AE60)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 2px 8px rgba(46,204,113,0.5)',
+                        border: '2px solid #1a1a2e'
+                      }}>
+                        <span style={{ color: 'white', fontSize: 11, fontWeight: 700 }}>✓</span>
+                      </div>
+                    )}
+
+                    {/* Lock Icon for Locked */}
+                    {!isUnlocked && (
+                      <div style={{
+                        position: 'absolute',
+                        bottom: -3,
+                        right: -3,
+                        width: 18,
+                        height: 18,
+                        borderRadius: '50%',
+                        background: 'rgba(0,0,0,0.7)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: '1px solid rgba(255,255,255,0.2)'
+                      }}>
+                        <span style={{ fontSize: 9 }}>🔒</span>
+                      </div>
+                    )}
                   </div>
                 );
               })}
             </div>
-          )}
+          </div>
 
-          {/* Continue Button */}
+          {/* Paw Sequences */}
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: 'white', marginBottom: 16 }}>🐾 DNA Paw Sequences</div>
+            
+            {islands.map((paw) => {
+              const pawTopics = allTopics.filter(t => paw.topics.includes(t.id));
+              const completedInPaw = pawTopics.filter(t => isTopicCompleted(t.id)).length;
+              const isPawComplete = completedInPaw === 3;
+              const isPawUnlocked = paw.id === 1 || islands[paw.id - 2]?.topics.every(tid => isTopicCompleted(tid));
+
+              return (
+                <div key={paw.id} style={{
+                  ...styles.darkCard,
+                  marginBottom: 12,
+                  opacity: isPawUnlocked ? 1 : 0.5,
+                  border: isPawComplete ? `2px solid ${paw.color}` : '1px solid rgba(255,255,255,0.1)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{
+                      width: 50, height: 50, borderRadius: 14,
+                      background: isPawComplete ? `linear-gradient(135deg, ${paw.color}, ${paw.color}CC)` : `${paw.color}22`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24,
+                      boxShadow: isPawComplete ? `0 4px 15px ${paw.color}44` : 'none'
+                    }}>
+                      {isPawComplete ? '🏆' : isPawUnlocked ? paw.emoji : '🔒'}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 15, fontWeight: 600, color: 'white' }}>Paw Sequence {paw.id}</div>
+                      <div style={{ fontSize: 12, color: paw.color }}>{paw.name}</div>
+                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>
+                        {completedInPaw}/3 completed
+                      </div>
+                    </div>
+                    {/* Mini Progress */}
+                    <div style={{ display: 'flex', gap: 4 }}>
+                      {pawTopics.map(t => (
+                        <div key={t.id} style={{
+                          width: 8, height: 8, borderRadius: '50%',
+                          background: isTopicCompleted(t.id) ? paw.color : 'rgba(255,255,255,0.2)'
+                        }} />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Quick Action */}
           {completedCount < 12 && (
             <button
-              onClick={() => setScreen('overview')}
+              onClick={() => {
+                const nextTopic = allTopics.find(t => isTopicUnlocked(t.id) && !isTopicCompleted(t.id));
+                if (nextTopic) {
+                  setCurrentTopic(nextTopic);
+                  setScreen('topic-intro');
+                }
+              }}
               style={{ ...styles.btn, ...styles.btnPrimary }}
             >
               🐾 ทำ Test ถัดไป
@@ -977,14 +2101,20 @@ export default function MhaStoryApp() {
         </div>
       </div>
     );
-  }
+  };
 
-  // Default fallback
   return (
-    <div style={styles.container}>
-      <div style={styles.content}>
-        <p style={{ color: 'white' }}>Loading...</p>
-      </div>
-    </div>
+    <>
+      {screen === 'landing' && <LandingScreen />}
+      {screen === 'overview' && <OverviewScreen />}
+      {screen === 'topic-intro' && <TopicIntroScreen />}
+      {screen === 'quiz' && <QuizScreen />}
+      {screen === 'result' && <ResultScreen />}
+      {screen === 'dashboard' && <DashboardScreen />}
+      
+      {showLeadGate && <LeadGateModal />}
+      {showBadgeModal && selectedBadge && <BadgePreviewModal />}
+      {showDimensionPopup && <DimensionPopup />}
+    </>
   );
 }
